@@ -1,2 +1,10 @@
-# SnowGlobe
-An AI driven simulation game lab
+# SnowGlobe 雪景球
+
+SnowGlobe 是一个利用生成式AI技术，自动生成游戏角色,游戏场景,游戏物品的实验室.
+在SnowGlobe中,玩家会拥有一个"雪景球"--一个小型的虚拟世界,有着几位居民.玩家可以与世界内场景交互,来影响世界内的生物与环境,从而影响整个小型文明的发展走向.
+
+## 导航
+
+###  文档列表
+
+- [项目规划](Documents/Plans.md) - 项目开发计划与路线图
