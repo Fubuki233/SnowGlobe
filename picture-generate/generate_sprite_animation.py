@@ -57,11 +57,11 @@ def generate_animation_video(reference_image, action_prompt):
     # 使用 Veo 3.1 生成视频，限制时长为4秒（最短）
     print("开始生成视频 (4秒时长)...")
     operation = client.models.generate_videos(
-        model="veo-3.1-fast-generate-preview",
+        model="veo-2.0-generate-001",
         prompt=action_prompt,
         image=veo_image,
         config=GenerateVideosConfig(
-            duration_seconds=4  # 最短时长为4秒
+            duration_seconds=5  # 最短时长为4秒
         )
     )
     
