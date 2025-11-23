@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://4pqund3nukl7"]
+
+[ext_resource type="Script" uid="uid://dm6yl0cfjisp3" path="res://scripts/icon.gd" id="1_0e48y"]
+[ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="2_epypp"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(93, 84)
+texture = ExtResource("2_epypp")
+script = ExtResource("1_0e48y")
+
+[node name="Timer" type="Timer" parent="Sprite2D"]

@@ -8,3 +8,5 @@ SnowGlobe 是一个利用生成式AI技术，自动生成游戏角色,游戏场�
 ###  文档列表
 
 - [项目规划](Documents/Plans.md) - 项目开发计划与路线图
+- [开发计划](Documents/DevelopPlan.md) - 开发任务列表
+- [技术文档](Documents/TechDocs.md) - 技术文档

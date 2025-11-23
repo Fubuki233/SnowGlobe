@@ -1,0 +1,53 @@
+[gd_scene load_steps=9 format=3 uid="uid://c1twr2i6iwxt8"]
+
+[ext_resource type="Script" uid="uid://b1nvycu07via4" path="res://scripts/mob.gd" id="1_b3mxk"]
+[ext_resource type="Texture2D" uid="uid://i5y61r8sroqu" path="res://Assets/Roles/Actors/DefaultGirl/frame_000.png" id="2_1qmh0"]
+[ext_resource type="Texture2D" uid="uid://n5tgeivxv00y" path="res://Assets/Roles/Actors/DefaultGirl/frame_001.png" id="3_gfurk"]
+[ext_resource type="Texture2D" uid="uid://dgut883aemgrk" path="res://Assets/Roles/Actors/DefaultGirl/frame_002.png" id="4_ieysi"]
+[ext_resource type="Texture2D" uid="uid://4hk511vt1tmb" path="res://Assets/Roles/Actors/DefaultGirl/frame_003.png" id="5_cixyi"]
+[ext_resource type="Texture2D" uid="uid://bfe4dihxdbrcd" path="res://Assets/Roles/Actors/DefaultGirl/frame_004.png" id="6_7ulmv"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pcqmr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_1qmh0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_gfurk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ieysi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_cixyi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_7ulmv")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jbnni"]
+radius = 382.0
+height = 1348.0
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Mob" type="RigidBody2D" parent="."]
+position = Vector2(728, 31)
+gravity_scale = 0.0
+script = ExtResource("1_b3mxk")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Mob"]
+sprite_frames = SubResource("SpriteFrames_pcqmr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mob"]
+shape = SubResource("CapsuleShape2D_jbnni")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="Mob"]
+
+[connection signal="screen_exited" from="Mob/VisibleOnScreenNotifier2D" to="Mob" method="_on_visible_on_screen_notifier_2d_screen_exited"]
