@@ -1,7 +1,7 @@
 # 开发计划
 
 ## 第一周计划
-python脚本操作方式详见[技术文档](Documents/TechDocs.md)
+python脚本操作方式详见[技术文档](TechDocs.md)
 | 角色 | 计划 |
 |------|------|
 | zyh | LLM+GOAP工作流，搭建测试场景 |
