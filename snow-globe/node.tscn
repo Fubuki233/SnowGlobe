@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://bhss2rc30pepk"]
+[gd_scene load_steps=11 format=4 uid="uid://bhss2rc30pepk"]
 
 [ext_resource type="Script" uid="uid://b8munxatrja3h" path="res://scripts/static/main.gd" id="1_qn3nj"]
 [ext_resource type="PackedScene" uid="uid://ckudr8chj1kgo" path="res://player.tscn" id="1_sy5k4"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://6wu7g3kt4wxk" path="res://scripts/test/button.gd" id="3_112p8"]
 [ext_resource type="Texture2D" uid="uid://dinc5gxnd0cau" path="res://tileset_advanced.png" id="4_e2u21"]
 [ext_resource type="Script" uid="uid://b1a61uabu7eqe" path="res://scripts/static/external_controller.gd" id="6_tda05"]
+[ext_resource type="Script" uid="uid://ecgt6a4qm4ek" path="res://scripts/items/test_items_spawn.gd" id="8_l6pdb"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bss38"]
 texture = ExtResource("4_e2u21")
@@ -35,6 +36,8 @@ tile_map_data = PackedByteArray("AAD8//3/AAAAAAAAAAD9//3/AAAAAAAAAAD+//3/AAAAAAA
 tile_set = SubResource("TileSet_tda05")
 script = ExtResource("2_bss38")
 
+[node name="ItemsContainer" type="Node2D" parent="."]
+
 [node name="player" parent="." instance=ExtResource("1_sy5k4")]
 script = ExtResource("2_112p8")
 
@@ -47,5 +50,8 @@ script = ExtResource("3_112p8")
 
 [node name="External_Controller" type="Node" parent="."]
 script = ExtResource("6_tda05")
+
+[node name="ItemTest" type="Node" parent="."]
+script = ExtResource("8_l6pdb")
 
 [connection signal="pressed" from="Button" to="player" method="_on_button_pressed"]

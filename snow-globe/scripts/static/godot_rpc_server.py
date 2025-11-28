@@ -109,10 +109,6 @@ class GodotRPCServer:
 async def main():
     """启动服务器"""
     server = GodotRPCServer()
-    
-    print("="*60)
-    print("🚀 Godot RPC 服务器")
-    print("="*60)
     print("监听: ws://localhost:8765")
     print("等待连接...\n")
     
