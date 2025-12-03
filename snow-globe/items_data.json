@@ -1,0 +1,238 @@
+{
+	"instance_count": 12,
+	"instances": [
+		{
+			"count": 1,
+			"instance_id": "b60adac0-4077-4590-8731-a6b0ddbeb041",
+			"position": {
+				"x": 200.0,
+				"y": 100.0
+			},
+			"template_id": "potion_health"
+		},
+		{
+			"count": 3,
+			"instance_id": "6c24413b-ab11-4571-b9b3-0eec4b32936f",
+			"position": {
+				"x": 250.0,
+				"y": 150.0
+			},
+			"template_id": "potion_health"
+		},
+		{
+			"count": 5,
+			"instance_id": "ef1e9b42-f6d2-4b87-8034-574e985403ff",
+			"position": {
+				"x": 300.0,
+				"y": 200.0
+			},
+			"template_id": "potion_health"
+		},
+		{
+			"count": 50,
+			"instance_id": "560a2e02-fa90-4651-8999-04245337ac37",
+			"position": {
+				"x": 150.0,
+				"y": 100.0
+			},
+			"template_id": "gold_coin"
+		},
+		{
+			"count": 30,
+			"instance_id": "c78587a2-3740-412d-9dcd-f258ba96f639",
+			"position": {
+				"x": 400.0,
+				"y": 150.0
+			},
+			"template_id": "gold_coin"
+		},
+		{
+			"count": 100,
+			"instance_id": "216606ad-aac4-406f-adaf-b4b6ec9e2b5f",
+			"position": {
+				"x": 500.0,
+				"y": 200.0
+			},
+			"template_id": "gold_coin"
+		},
+		{
+			"count": 75,
+			"instance_id": "8732eafd-54bc-4b47-bbe0-748d0d807a18",
+			"position": {
+				"x": 350.0,
+				"y": 250.0
+			},
+			"template_id": "gold_coin"
+		},
+		{
+			"count": 1,
+			"instance_id": "040c971b-b8b0-43dc-ba68-a5c597f12a4d",
+			"position": {
+				"x": 450.0,
+				"y": 100.0
+			},
+			"template_id": "sword_iron"
+		},
+		{
+			"count": 1,
+			"instance_id": "0784e00d-d1a8-44f5-be72-c6e045df0955",
+			"position": {
+				"x": 550.0,
+				"y": 150.0
+			},
+			"template_id": "sword_iron"
+		},
+		{
+			"count": 1,
+			"instance_id": "c2e7b94e-984b-47c3-8d19-f8fc3aab8af1",
+			"position": {
+				"x": 300.0,
+				"y": 300.0
+			},
+			"template_id": "armor_leather"
+		},
+		{
+			"count": 1,
+			"instance_id": "501c332c-7769-4124-96c1-de39297fb11e",
+			"position": {
+				"x": 600.0,
+				"y": 300.0
+			},
+			"template_id": "gem_legendary"
+		},
+		{
+			"count": 2,
+			"instance_id": "bb6bc166-ee63-4673-b7ca-63c4e9ba9cb2",
+			"position": {
+				"x": 250.0,
+				"y": 250.0
+			},
+			"template_id": "potion_energy"
+		}
+	],
+	"template_count": 6,
+	"templates": [
+		{
+			"class_type": "Resource",
+			"consumable": {
+				"buff_duration": 0.0,
+				"buff_effects": {
+
+				},
+				"restore_energy": 0,
+				"restore_health": 50,
+				"restore_hunger": 0,
+				"restore_thirst": 0
+			},
+			"description": "恢复50点生命值",
+			"is_stackable": true,
+			"item_id": "potion_health",
+			"item_name": "生命药水",
+			"item_type": "CONSUMABLE",
+			"max_stack": 99,
+			"rarity": "COMMON",
+			"tags": [],
+			"value": 10,
+			"weight": 1.0
+		},
+		{
+			"class_type": "Resource",
+			"description": "闪闪发光的金币",
+			"is_stackable": true,
+			"item_id": "gold_coin",
+			"item_name": "金币",
+			"item_type": "MISC",
+			"max_stack": 999,
+			"rarity": "COMMON",
+			"tags": [],
+			"value": 1,
+			"weight": 0.01
+		},
+		{
+			"class_type": "Resource",
+			"description": "一把普通的铁剑,适合初学者使用",
+			"equipment": {
+				"agility_bonus": 0,
+				"armor": 0,
+				"damage": 15,
+				"durability": 100,
+				"endurance_bonus": 0,
+				"equip_slot": "MAIN_HAND",
+				"intelligence_bonus": 0,
+				"max_durability": 100,
+				"strength_bonus": 2
+			},
+			"is_stackable": false,
+			"item_id": "sword_iron",
+			"item_name": "铁剑",
+			"item_type": "EQUIPMENT",
+			"max_stack": 1,
+			"rarity": "UNCOMMON",
+			"tags": [],
+			"value": 100,
+			"weight": 2.5
+		},
+		{
+			"class_type": "Resource",
+			"description": "轻便的皮革护甲,提供基础防护",
+			"equipment": {
+				"agility_bonus": 0,
+				"armor": 10,
+				"damage": 0,
+				"durability": 100,
+				"endurance_bonus": 0,
+				"equip_slot": "CHEST",
+				"intelligence_bonus": 0,
+				"max_durability": 100,
+				"strength_bonus": 0
+			},
+			"is_stackable": false,
+			"item_id": "armor_leather",
+			"item_name": "皮革护甲",
+			"item_type": "EQUIPMENT",
+			"max_stack": 1,
+			"rarity": "COMMON",
+			"tags": [],
+			"value": 80,
+			"weight": 3.0
+		},
+		{
+			"class_type": "Resource",
+			"description": "散发着神秘光芒的珍贵宝石",
+			"is_stackable": false,
+			"item_id": "gem_legendary",
+			"item_name": "传说宝石",
+			"item_type": "MISC",
+			"max_stack": 1,
+			"rarity": "LEGENDARY",
+			"tags": [],
+			"value": 1000,
+			"weight": 0.1
+		},
+		{
+			"class_type": "Resource",
+			"consumable": {
+				"buff_duration": 0.0,
+				"buff_effects": {
+
+				},
+				"restore_energy": 0,
+				"restore_health": 0,
+				"restore_hunger": 0,
+				"restore_thirst": 0
+			},
+			"description": "恢复100点能量值",
+			"is_stackable": true,
+			"item_id": "potion_energy",
+			"item_name": "能量药水",
+			"item_type": "CONSUMABLE",
+			"max_stack": 50,
+			"rarity": "UNCOMMON",
+			"tags": [],
+			"value": 25,
+			"weight": 1.2
+		}
+	],
+	"timestamp": 1764352200.906,
+	"version": "2.0"
+}

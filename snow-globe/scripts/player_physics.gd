@@ -467,14 +467,18 @@ func move_along_path():
 	var target = target_path[current_path_index]
 	var direction = (target - global_position).normalized()
 	var distance = global_position.distance_to(target)
-		
-	if distance < 2:
+	
+	var arrival_threshold = 10.0
+	
+	if distance < arrival_threshold:
 		current_path_index += 1
-		emit_signal("player_moved", global_position)
+		# 只在到达最终目标时发出信号
+		if current_path_index >= target_path.size():
+			emit_signal("player_moved", global_position)
 	else:
 		velocity = direction * path_speed
 		$AnimatedSprite2D.play()
-		emit_signal("player_moved", global_position)
+	
 	move_and_slide()
 
 func manual_control():

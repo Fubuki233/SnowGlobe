@@ -6,9 +6,16 @@
 
 ### 使用方法
 
-首先启动godot项目,此时godot项目会自动加载RPC服务器脚本:
+对于想要控制的函数,需要设置唯一ID并注册到 GodotRPC:
 
-加载方式:
+```GDscript
+@export var id = "player_1"
+GodotRPC.register_instance(id, self)
+```
+
+然后启动godot项目,此时godot项目会自动加载RPC服务器脚本:
+
+加载方式(这部分会被自动加载,不需要手动处理):
 
 ```GDscript
 #project.godot内:

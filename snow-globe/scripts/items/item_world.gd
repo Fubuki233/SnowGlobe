@@ -56,22 +56,7 @@ func _ready() -> void:
 			collision_shape.shape.radius = pickup_radius
 
 func _process(delta: float) -> void:
-	time += delta
-	
-	if is_being_attracted and attraction_target:
-		# 被吸引向目标移动
-		var direction = (attraction_target.global_position - global_position).normalized()
-		global_position += direction * magnetic_speed * delta
-		
-		# 检查是否足够接近
-		if global_position.distance_to(attraction_target.global_position) < 10.0:
-			pickup_item(attraction_target)
-	else:
-		# 浮动效果
-		position.y = initial_y + sin(time * bob_speed) * bob_height
-	
-	# 旋转效果
-	sprite.rotation += rotation_speed * delta
+	pass
 
 func update_label() -> void:
 	"""更新显示标签"""

@@ -6,8 +6,14 @@ var show_debug_grid = true # 是否显示调试网格
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	GodotRPC.register_instance(id, self)
+	
+	# 确保获取正确的 tile_size
+	var current_tile_size = tile_set.tile_size
+	print("TileSet tile_size: ", current_tile_size)
+	
+	# 配置 A* 网格
 	a_star.region = get_used_rect()
-	a_star.cell_size = tile_set.tile_size
+	a_star.cell_size = current_tile_size # 使用当前的 tile_size
 	a_star.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	a_star.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	a_star.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
@@ -20,7 +26,11 @@ func _ready() -> void:
 			# 检查坐标是否在 A* 区域内
 			if a_star.is_in_boundsv(tile_pos) and not is_walkable(tile_pos):
 				a_star.set_point_solid(tile_pos)
-	print("TileMapLayer ready, AStar region: ", a_star.region)
+	
+	print("TileMapLayer ready")
+	print("  Region: ", a_star.region)
+	print("  Cell size: ", a_star.cell_size)
+	print("  Offset: ", a_star.offset)
 
 func get_random_walkable_position() -> Vector2:
 	"""获取随机的可行走位置(世界坐标)"""
@@ -55,14 +65,37 @@ func is_walkable(tile_pos: Vector2i) -> bool:
 
 func get_astar_path(from_grid: Vector2i, to_grid: Vector2i) -> PackedVector2Array:
 	"""获取从起点到终点的路径(网格坐标输入,返回世界坐标路径)"""
+	# 检查起点和终点是否在范围内
+	if not a_star.is_in_boundsv(from_grid):
+		print("警告: 起点 ", from_grid, " 超出 A* 范围 ", a_star.region)
+		return PackedVector2Array()
+	
+	if not a_star.is_in_boundsv(to_grid):
+		print("警告: 终点 ", to_grid, " 超出 A* 范围 ", a_star.region)
+		return PackedVector2Array()
+	
+	# 检查起点和终点是否可行走
+	if a_star.is_point_solid(from_grid):
+		print("警告: 起点 ", from_grid, " 是障碍物")
+		return PackedVector2Array()
+	
+	if a_star.is_point_solid(to_grid):
+		print("警告: 终点 ", to_grid, " 是障碍物")
+		return PackedVector2Array()
+	
 	# 使用 A* 计算路径
 	var path_tiles = a_star.get_id_path(from_grid, to_grid)
+	
+	if path_tiles.size() == 0:
+		print("警告: 无法找到从 ", from_grid, " 到 ", to_grid, " 的路径")
+		return PackedVector2Array()
 	
 	# 转换为世界坐标
 	var path_world = PackedVector2Array()
 	for tile in path_tiles:
 		path_world.append(map_to_local(tile))
 	
+	print("路径计算成功: ", from_grid, " -> ", to_grid, ", 步数: ", path_tiles.size())
 	return path_world
 
 func _draw():
@@ -70,7 +103,7 @@ func _draw():
 		return
 	
 	var used_rect = get_used_rect()
-	var tile_size = tile_set.tile_size
+	var current_tile_size = tile_set.tile_size # 使用当前的 tile_size
 	
 	# 绘制网格线
 	for x in range(used_rect.position.x, used_rect.end.x + 1):
@@ -79,8 +112,8 @@ func _draw():
 			var world_pos = map_to_local(tile_pos)
 			
 			# 绘制网格边框
-			var rect_pos = world_pos - Vector2(tile_size) / 2
-			draw_rect(Rect2(rect_pos, tile_size), Color(0, 1, 0, 0.3), false, 1.0)
+			var rect_pos = world_pos - Vector2(current_tile_size) / 2
+			draw_rect(Rect2(rect_pos, current_tile_size), Color(0, 1, 0, 0.3), false, 1.0)
 			
 			if x % 2 == 0 and y % 2 == 0:
 				var coord_text = "(%d,%d)" % [x, y]

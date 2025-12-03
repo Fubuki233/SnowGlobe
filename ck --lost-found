@@ -1,0 +1,63 @@
+[33mcommit 11d9030b2231a38cedee37cd8a9837136a72dc5e[m
+Author: leo <36483654@qq.com>
+Date:   Mon Nov 24 19:00:55 2025 +0800
+
+    myy update docs
+
+[1mdiff --git a/snow-globe/Assets/Environments/grass.jpg b/snow-globe/Assets/Environments/grass.jpg[m
+[1mindex 2ae3d8b..2229363 100644[m
+Binary files a/snow-globe/Assets/Environments/grass.jpg and b/snow-globe/Assets/Environments/grass.jpg differ
+[1mdiff --git a/snow-globe/Assets/Environments/tileset_advanced.png b/snow-globe/Assets/Environments/tileset_advanced.png[m
+[1mindex b9334de..44b6c83 100644[m
+Binary files a/snow-globe/Assets/Environments/tileset_advanced.png and b/snow-globe/Assets/Environments/tileset_advanced.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/3_final_sprite_sheet.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/3_final_sprite_sheet.png[m
+[1mindex 6aa9ba3..82bcdb3 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/3_final_sprite_sheet.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/3_final_sprite_sheet.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_000.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_000.png[m
+[1mindex 59e5519..0b37a33 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_000.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_000.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_001.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_001.png[m
+[1mindex 21c20a8..2fef55b 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_001.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_001.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_002.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_002.png[m
+[1mindex 563c3b9..c023cab 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_002.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_002.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_003.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_003.png[m
+[1mindex ff676f8..c176ead 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_003.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_003.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_004.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_004.png[m
+[1mindex 222b226..e0a2922 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_004.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_004.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_005.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_005.png[m
+[1mindex 16c7516..0ea8871 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_005.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_005.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_006.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_006.png[m
+[1mindex f76c114..0c022f0 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_006.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_006.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_007.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_007.png[m
+[1mindex a196ef8..b9b15b4 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_007.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_007.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_008.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_008.png[m
+[1mindex de0cb44..a607c28 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_008.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_008.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_009.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_009.png[m
+[1mindex aadb563..937a26e 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_009.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_009.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_010.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_010.png[m
+[1mindex ad3b715..fbce8f8 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_010.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_010.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_011.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_011.png[m
+[1mindex a2f8db0..9bf34ff 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_011.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_011.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_012.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_012.png[m
+[1mindex ecba10f..e56734b 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_012.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_012.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_013.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_013.png[m
+[1mindex ac7cf77..0b8f635 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_013.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_013.png differ
+[1mdiff --git a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_014.png b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_014.png[m
+[1mindex f272461..bfd1514 100644[m
+Binary files a/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_014.png and b/snow-globe/Assets/Roles/Actors/DefaultGirl/frame_014.png differ
+[1mdiff --git a/snow-globe/tileset_advanced.png b/snow-globe/tileset_advanced.png[m
+[1mindex b9334de..44b6c83 100644[m
+Binary files a/snow-globe/tileset_advanced.png and b/snow-globe/tileset_advanced.png differ

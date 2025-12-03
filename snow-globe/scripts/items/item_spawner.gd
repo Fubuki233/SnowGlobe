@@ -60,11 +60,8 @@ static func spawn_item(item: ItemBase, world_position: Vector2, parent: Node, co
 	"""
 	var item_world: ItemWorld
 	
-	# 尝试使用预制体,否则代码创建
-	if ResourceLoader.exists("res://scripts/items/item_world.tscn"):
-		item_world = ITEM_WORLD_SCENE.instantiate()
-	else:
-		item_world = create_item_world_node()
+
+	item_world = create_item_world_node()
 	
 	# 设置位置
 	item_world.global_position = world_position
