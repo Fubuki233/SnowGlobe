@@ -59,7 +59,13 @@ func is_walkable(tile_pos: Vector2i) -> bool:
 	if not tile_data:
 		return false
 	
-	var block_name = tile_data.get_custom_data("Block Name")
+	# 检查自定义数据层是否存在
+	var block_name = ""
+	if tile_set.get_custom_data_layer_by_name("Name") >= 0:
+		var custom_name = tile_data.get_custom_data("Name")
+		if custom_name != null:
+			block_name = str(custom_name)
+	
 	# Grass 可行走, Stone 和 Sea 不可行走
 	return block_name == "Grass"
 

@@ -83,8 +83,8 @@ static func import_image_to_tileset(
 	full_metadata["source_path"] = image_path
 	_set_metadata(atlas_source, actual_tile_id, full_metadata)
 	
-	# 如果是物体且需要碰撞,生成碰撞体积
-	if tile_type == TileType.OBJECT and need_collision:
+	# 如果需要碰撞,生成碰撞体积(地形和物体都生成)
+	if need_collision:
 		_generate_collision(atlas_source, actual_tile_id, image, image_size)
 	
 	print("✓ 导入成功\n")
@@ -143,23 +143,27 @@ static func _get_or_create_atlas_source(
 ) -> TileSetAtlasSource:
 	"""获取或创建 TileSetAtlasSource"""
 	# 查找现有的 Atlas Source (必须纹理和尺寸都匹配)
-	var source_id = 0
-	for id in tile_set.get_source_count():
-		var source = tile_set.get_source(id)
+	var next_source_id = 0
+	for i in tile_set.get_source_count():
+		var existing_id = tile_set.get_source_id(i)
+		if existing_id >= next_source_id:
+			next_source_id = existing_id + 1
+			
+		var source = tile_set.get_source(existing_id)
 		if source is TileSetAtlasSource:
 			var atlas = source as TileSetAtlasSource
 			# 纹理和区域尺寸都必须匹配
 			if atlas.texture == texture and atlas.texture_region_size == tile_size:
+				print("使用现有 Atlas Source (ID: %d)" % existing_id)
 				return atlas
-			source_id = id + 1
 	
 	# 创建新的 Atlas Source
 	var atlas_source = TileSetAtlasSource.new()
 	atlas_source.texture = texture
 	atlas_source.texture_region_size = tile_size
 	
-	tile_set.add_source(atlas_source, source_id)
-	print("创建新的 Atlas Source (ID: %d, 尺寸: %s)" % [source_id, tile_size])
+	var new_id = tile_set.add_source(atlas_source, next_source_id)
+	print("创建新的 Atlas Source (ID: %d, 尺寸: %s)" % [new_id, tile_size])
 	
 	return atlas_source
 
@@ -228,13 +232,18 @@ static func _generate_collision(
 		print("  警告: 图片完全透明,跳过碰撞生成")
 		return
 	
-	# 创建简化的矩形碰撞体
-	var polygon = PackedVector2Array([
-		Vector2(collision_rect.position.x - image_size.x / 2, collision_rect.position.y - image_size.y / 2),
-		Vector2(collision_rect.end.x - image_size.x / 2, collision_rect.position.y - image_size.y / 2),
-		Vector2(collision_rect.end.x - image_size.x / 2, collision_rect.end.y - image_size.y / 2),
-		Vector2(collision_rect.position.x - image_size.x / 2, collision_rect.end.y - image_size.y / 2)
-	])
+	# 生成精细的碰撞多边形
+	var polygon = _trace_contour(image, image_size)
+	
+	if polygon.size() < 3:
+		print("  警告: 无法生成有效的碰撞多边形,使用矩形碰撞")
+		# 回退到矩形碰撞
+		polygon = PackedVector2Array([
+			Vector2(collision_rect.position.x - image_size.x / 2, collision_rect.position.y - image_size.y / 2),
+			Vector2(collision_rect.end.x - image_size.x / 2, collision_rect.position.y - image_size.y / 2),
+			Vector2(collision_rect.end.x - image_size.x / 2, collision_rect.end.y - image_size.y / 2),
+			Vector2(collision_rect.position.x - image_size.x / 2, collision_rect.end.y - image_size.y / 2)
+		])
 	
 	# 设置碰撞多边形
 	var tile_data = atlas_source.get_tile_data(tile_id, 0)
@@ -244,7 +253,140 @@ static func _generate_collision(
 			tile_data.add_collision_polygon(physics_layer)
 		tile_data.set_collision_polygon_points(physics_layer, 0, polygon)
 	
-	print("  ✓ 碰撞体积: %s" % collision_rect)
+	print("碰撞体积: %d 个顶点" % polygon.size())
+
+## 辅助方法:轮廓追踪生成精细多边形
+static func _trace_contour(image: Image, image_size: Vector2i) -> PackedVector2Array:
+	"""追踪图片轮廓生成精细碰撞多边形"""
+	var width = image.get_width()
+	var height = image.get_height()
+	var bounds = _get_opaque_bounds(image)
+	
+	if bounds.size.x == 0 or bounds.size.y == 0:
+		return PackedVector2Array()
+	
+	var points = PackedVector2Array()
+	
+	# 采样边界上的点以创建更精细的轮廓
+	var sample_step = max(2, int(min(bounds.size.x, bounds.size.y) / 8))
+	
+	# 上边 (从左到右)
+	for x in range(bounds.position.x, min(bounds.end.x, width), sample_step):
+		var y = _find_top_edge(image, x, bounds.position.y, bounds.end.y)
+		if y >= 0:
+			points.append(Vector2(x - image_size.x / 2, y - image_size.y / 2))
+	
+	# 右边 (从上到下)
+	for y in range(bounds.position.y, min(bounds.end.y, height), sample_step):
+		var x = _find_right_edge(image, y, bounds.position.x, bounds.end.x)
+		if x >= 0:
+			points.append(Vector2(x - image_size.x / 2, y - image_size.y / 2))
+	
+	# 下边 (从右到左)
+	for x in range(min(bounds.end.x - 1, width - 1), bounds.position.x - 1, -sample_step):
+		var y = _find_bottom_edge(image, x, bounds.position.y, bounds.end.y)
+		if y >= 0:
+			points.append(Vector2(x - image_size.x / 2, y - image_size.y / 2))
+	
+	# 左边 (从下到上)
+	for y in range(min(bounds.end.y - 1, height - 1), bounds.position.y - 1, -sample_step):
+		var x = _find_left_edge(image, y, bounds.position.x, bounds.end.x)
+		if x >= 0:
+			points.append(Vector2(x - image_size.x / 2, y - image_size.y / 2))
+	
+	# 简化多边形(移除共线点)
+	var simplified = _simplify_polygon(points)
+	
+	# 验证多边形有效性
+	if simplified.size() < 3:
+		return PackedVector2Array()
+	
+	# 确保多边形是顺时针方向(Godot要求)
+	if _is_polygon_counter_clockwise(simplified):
+		simplified.reverse()
+	
+	return simplified
+
+## 辅助方法:检查多边形是否逆时针
+static func _is_polygon_counter_clockwise(points: PackedVector2Array) -> bool:
+	"""使用有向面积判断多边形方向"""
+	var area = 0.0
+	for i in range(points.size()):
+		var p1 = points[i]
+		var p2 = points[(i + 1) % points.size()]
+		area += (p2.x - p1.x) * (p2.y + p1.y)
+	return area > 0
+
+## 辅助方法:查找边缘像素
+static func _find_top_edge(image: Image, x: int, y_min: int, y_max: int) -> int:
+	"""从上往下查找第一个不透明像素"""
+	for y in range(y_min, y_max):
+		var pixel = image.get_pixel(x, y)
+		if pixel.a * 255 > ALPHA_THRESHOLD:
+			return y
+	return -1
+
+static func _find_bottom_edge(image: Image, x: int, y_min: int, y_max: int) -> int:
+	"""从下往上查找第一个不透明像素"""
+	for y in range(y_max - 1, y_min - 1, -1):
+		var pixel = image.get_pixel(x, y)
+		if pixel.a * 255 > ALPHA_THRESHOLD:
+			return y
+	return -1
+
+static func _find_left_edge(image: Image, y: int, x_min: int, x_max: int) -> int:
+	"""从左往右查找第一个不透明像素"""
+	for x in range(x_min, x_max):
+		var pixel = image.get_pixel(x, y)
+		if pixel.a * 255 > ALPHA_THRESHOLD:
+			return x
+	return -1
+
+static func _find_right_edge(image: Image, y: int, x_min: int, x_max: int) -> int:
+	"""从右往左查找第一个不透明像素"""
+	for x in range(x_max - 1, x_min - 1, -1):
+		var pixel = image.get_pixel(x, y)
+		if pixel.a * 255 > ALPHA_THRESHOLD:
+			return x
+	return -1
+
+## 辅助方法:简化多边形
+static func _simplify_polygon(points: PackedVector2Array, epsilon: float = 2.0) -> PackedVector2Array:
+	"""使用距离阈值简化多边形"""
+	if points.size() < 3:
+		return points
+	
+	# 移除重复点
+	var unique_points = PackedVector2Array()
+	for i in range(points.size()):
+		if unique_points.size() == 0 or points[i].distance_to(unique_points[-1]) > 0.5:
+			unique_points.append(points[i])
+	
+	if unique_points.size() < 3:
+		return unique_points
+	
+	# 简单的距离阈值简化
+	var simplified = PackedVector2Array()
+	simplified.append(unique_points[0])
+	
+	for i in range(1, unique_points.size() - 1):
+		var prev = simplified[-1]
+		var curr = unique_points[i]
+		var next = unique_points[i + 1]
+		
+		# 计算点到线段的距离
+		var line_vec = next - prev
+		var point_vec = curr - prev
+		var line_len = line_vec.length()
+		
+		if line_len > 0:
+			var dist = abs(line_vec.cross(point_vec)) / line_len
+			if dist > epsilon:
+				simplified.append(curr)
+	
+	simplified.append(unique_points[-1])
+	
+	return simplified
 
 ## 辅助方法:获取不透明区域的边界
 static func _get_opaque_bounds(image: Image) -> Rect2i:
@@ -408,143 +550,6 @@ static func import_to_existing_tileset(
 		return save_tileset_to_file(tile_set, tileset_path)
 	
 	return success
-
-## 便捷方法:批量导入到现有 TileSet 文件
-static func batch_import_to_existing_tileset(
-	tileset_path: String,
-	image_paths: Array[String],
-	need_collision: bool = true,
-	auto_save: bool = true
-) -> int:
-	"""
-	批量导入图片到现有的 TileSet 文件
-	
-	参数:
-		tileset_path: TileSet 文件路径
-		image_paths: 图片路径数组
-		need_collision: 是否需要碰撞体积
-		auto_save: 是否自动保存
-	
-	返回: 成功导入的数量
-	"""
-	# 加载现有 TileSet
-	var tile_set = load_tileset_from_file(tileset_path)
-	if not tile_set:
-		push_error("无法加载 TileSet: %s" % tileset_path)
-		return 0
-	
-	var success_count = 0
-	var skipped_count = 0
-	
-	for image_path in image_paths:
-		var tile_name = image_path.get_file().get_basename()
-		
-		# 检查是否已存在
-		var existing_tile = find_tile_by_id(tile_set, tile_name)
-		if not existing_tile.is_empty():
-			print("跳过已存在的瓦片: %s" % tile_name)
-			skipped_count += 1
-			continue
-		
-		# 导入新图片
-		if import_image_to_tileset(tile_set, image_path, need_collision):
-			success_count += 1
-	
-	print("\n=== 批量导入完成 ===")
-	print("成功: %d, 跳过: %d, 总计: %d" % [success_count, skipped_count, image_paths.size()])
-	
-	# 保存 TileSet
-	if success_count > 0 and auto_save:
-		save_tileset_to_file(tile_set, tileset_path)
-	
-	return success_count
-
-## 便捷方法:从文件夹导入到现有 TileSet
-static func import_directory_to_existing_tileset(
-	tileset_path: String,
-	directory_path: String,
-	need_collision: bool = true,
-	auto_save: bool = true
-) -> int:
-	"""
-	从文件夹批量导入图片到现有的 TileSet 文件
-	
-	参数:
-		tileset_path: TileSet 文件路径
-		directory_path: 图片文件夹路径
-		need_collision: 是否需要碰撞体积
-		auto_save: 是否自动保存
-	
-	返回: 成功导入的数量
-	"""
-	# 扫描文件夹获取图片列表
-	var dir = DirAccess.open(directory_path)
-	if not dir:
-		push_error("无法打开目录: " + directory_path)
-		return 0
-	
-	var files: Array[String] = []
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	
-	while file_name != "":
-		if not dir.current_is_dir() and _is_image_file(file_name):
-			files.append(directory_path.path_join(file_name))
-		file_name = dir.get_next()
-	
-	dir.list_dir_end()
-	
-	print("\n=== 从文件夹导入到现有 TileSet ===")
-	print("TileSet: %s" % tileset_path)
-	print("文件夹: %s" % directory_path)
-	print("找到 %d 个图片文件" % files.size())
-	
-	# 批量导入
-	return batch_import_to_existing_tileset(tileset_path, files, need_collision, auto_save)
-
-
-## 便捷方法:从文件夹批量导入
-static func import_from_directory(
-	tile_set: TileSet,
-	directory_path: String,
-	need_collision_for_objects: bool = true
-) -> int:
-	"""
-	从文件夹批量导入图片
-	
-	参数:
-		tile_set: 目标 TileSet
-		directory_path: 文件夹路径 (res://...)
-		need_collision_for_objects: 物体是否需要碰撞
-	
-	返回: 导入数量
-	"""
-	var dir = DirAccess.open(directory_path)
-	if not dir:
-		push_error("无法打开目录: " + directory_path)
-		return 0
-	
-	var files: Array[String] = []
-	dir.list_dir_begin()
-	var file_name = dir.get_next()
-	
-	while file_name != "":
-		if not dir.current_is_dir() and _is_image_file(file_name):
-			files.append(directory_path.path_join(file_name))
-		file_name = dir.get_next()
-	
-	dir.list_dir_end()
-	
-	print("\n=== 从文件夹导入 ===")
-	print("路径: %s" % directory_path)
-	print("找到 %d 个图片文件" % files.size())
-	
-	var success_count = 0
-	for i in range(files.size()):
-		if import_image_to_tileset(tile_set, files[i], need_collision_for_objects):
-			success_count += 1
-	
-	return success_count
 
 ## 辅助方法:判断是否为图片文件
 static func _is_image_file(filename: String) -> bool:

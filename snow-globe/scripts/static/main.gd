@@ -1,6 +1,7 @@
 extends Node
 
 var python_server_pid: int = 0
+var TileManager = preload("res://scripts/static/tile_manager.gd")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -9,21 +10,23 @@ func _ready() -> void:
 	TilemapImporter.import_to_existing_tileset(
 		"res://Assets/Environments/static_layer.tres",
 		"res://Assets/Environments/clay.png",
-		true, # 需要碰撞
+		true,
 		"",
 		"",
 		{"description": "粘土", "category": "terrain"},
-		true # 自动保存
+		true
 	)
 	TilemapImporter.place_tile_by_id(
 		get_tree().get_current_scene().get_node("Node2D/UpperLayerObstacle"),
 		"clay",
 		Vector2i(5, 5)
 	)
-	
-	# 加载物品数据并生成到地图
+	var tm = get_tree().get_current_scene().get_node("Node2D/UpperLayerObstacle")
+	if tm:
+		for tile_pos in tm.get_used_cells():
+			var tile_name = tm.get_tile_name(tile_pos)
+			print("Tile at ", tile_pos, " has name: ", tile_name)
 	if not Iitem.load_and_spawn_items():
-		# 如果没有保存的数据,创建示例物品
 		create_example_items()
 	
 
@@ -40,14 +43,12 @@ func start_python_server() -> void:
 	else:
 		push_error("Python 服务器启动失败")
 
-# 停止 Python 服务器
 func stop_python_server() -> void:
 	if python_server_pid > 0:
 		OS.kill(python_server_pid)
 		print("Python 服务器已停止")
 		python_server_pid = 0
 
-# 游戏退出时清理
 func _exit_tree() -> void:
 	stop_python_server()
 
@@ -157,15 +158,7 @@ func create_example_items() -> void:
 	)
 	Iitem.spawn_instance("potion_energy", Vector2(250, 250), 2)
 	
-	print("\n=== 示例物品创建完成 ===")
-	print("提示: 靠近物品自动拾取")
-	print("提示: 使用 Iitem.save_all_items() 保存物品数据")
-	print("提示: 重启游戏后会自动加载保存的物品\n")
-	
-	# 自动保存
 	Iitem.save_all_items()
-	
-	# 打印注册表统计
 	Iitem.print_all_items()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

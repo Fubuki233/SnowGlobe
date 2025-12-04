@@ -4,9 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://ckudr8chj1kgo" path="res://player.tscn" id="1_sy5k4"]
 [ext_resource type="Script" uid="uid://bgkpj6vs3x83x" path="res://scripts/player_react.gd" id="2_112p8"]
 [ext_resource type="Script" uid="uid://dwuascp577mlh" path="res://scripts/static/tile_map_layer.gd" id="2_bss38"]
-[ext_resource type="TileSet" uid="uid://786xua3y8jc7" path="res://Assets/Environments/static_layer.tres" id="2_qn3nj"]
+[ext_resource type="TileSet" uid="uid://ctjqf32uf4i4o" path="res://Assets/Environments/static_layer.tres" id="2_qn3nj"]
 [ext_resource type="Script" uid="uid://6wu7g3kt4wxk" path="res://scripts/test/button.gd" id="3_112p8"]
-[ext_resource type="Script" uid="uid://brpik4m2ek3tw" path="res://scripts/static/upper_layer_obstacle.gd" id="6_r657h"]
+[ext_resource type="Script" uid="uid://ceng428nubaem" path="res://scripts/static/tile_manager.gd" id="6_l6pdb"]
 [ext_resource type="Script" uid="uid://b1a61uabu7eqe" path="res://scripts/static/external_controller.gd" id="6_tda05"]
 
 [node name="main" type="Node"]
@@ -27,7 +27,7 @@ script = ExtResource("2_112p8")
 position = Vector2(-214, 537)
 tile_map_data = PackedByteArray("AAABAAEAAQAFAAMAAAACAAEAAQAFAAMAAAACAAIAAQAFAAMAAAABAAIAAQAFAAMAAAABAAMAAQAFAAMAAAAEAAEAAQAFAAMAAAAEAAIAAQAFAAMAAAAFAAIAAQAFAAMAAAAGAAIAAQAFAAMAAAAGAAEAAQAFAAMAAAAGAAAAAQAFAAMAAAAHAAAAAQAFAAMAAAAGAP//AQAFAAMAAAAFAP//AQAFAAMAAAAEAP//AQAFAAMAAAAEAAAAAQAFAAMAAAAFAAAAAQAFAAMAAAAFAAEAAQAFAAMAAAADAAAAAQAFAAMAAAADAAEAAQAFAAMAAAA=")
 tile_set = ExtResource("2_qn3nj")
-script = ExtResource("6_r657h")
+script = ExtResource("6_l6pdb")
 
 [node name="ItemsContainer" type="Node2D" parent="."]
 
