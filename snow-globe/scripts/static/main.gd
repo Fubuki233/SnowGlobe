@@ -7,27 +7,264 @@ var TileManager = preload("res://scripts/static/tile_manager.gd")
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	start_python_server()
-	TilemapImporter.import_to_existing_tileset(
-		"res://Assets/Environments/static_layer.tres",
-		"res://Assets/Environments/clay.png",
-		true,
-		"",
-		"",
-		{"description": "粘土", "category": "terrain"},
-		true
-	)
-	TilemapImporter.place_tile_by_id(
-		get_tree().get_current_scene().get_node("Node2D/UpperLayerObstacle"),
-		"clay",
-		Vector2i(5, 5)
-	)
-	var tm = get_tree().get_current_scene().get_node("Node2D/UpperLayerObstacle")
-	if tm:
-		for tile_pos in tm.get_used_cells():
-			var tile_name = tm.get_tile_name(tile_pos)
-			print("Tile at ", tile_pos, " has name: ", tile_name)
-	if not Iitem.load_and_spawn_items():
-		create_example_items()
+	
+	# 测试 AI 物品加载系统
+	test_ai_item_system()
+	
+	# 延迟测试物品使用（等待场景加载完成）
+	await get_tree().create_timer(1.0).timeout
+	test_item_usage()
+	
+	#if not Iitem.load_and_spawn_items():
+		#sssssssscreate_example_items()
+
+func test_ai_item_system() -> void:
+	"""测试 AI 物品加载系统"""
+	print("\n========== 测试 AI 物品系统 ==========\n")
+	
+	# 1. 创建测试目录
+	var ai_items_dir = "user://ai_items/"
+	if not DirAccess.dir_exists_absolute(ai_items_dir):
+		DirAccess.make_dir_recursive_absolute(ai_items_dir)
+	
+	# 2. 创建测试 JSON 配置
+	create_test_ai_items()
+	
+	# 3. 加载 AI 生成的武器
+	var weapon = AIItemLoader.load_ai_item("user://ai_items/flame_sword.json")
+	if weapon:
+		weapon.position = Vector2(400, 200)
+		add_child(weapon)
+		print("✓ 已加载 AI 武器到场景")
+	
+	# 4. 加载 AI 生成的药水
+	var potion = AIItemLoader.load_ai_item("user://ai_items/health_potion.json")
+	if potion:
+		potion.position = Vector2(550, 200)
+		add_child(potion)
+		print("✓ 已加载 AI 药水到场景")
+	
+	# 5. 批量加载所有 AI 物品
+	var all_items = AIItemLoader.load_all_from_directory(ai_items_dir)
+	print("✓ 从目录加载了 %d 个 AI 物品" % all_items.size())
+	
+	# 排列显示（除了前面已加载的）
+	for i in range(2, all_items.size()):
+		all_items[i].position = Vector2(300 + i * 100, 350)
+		add_child(all_items[i])
+	
+	print("\n========================================\n")
+
+func create_test_ai_items() -> void:
+	"""创建测试用的 AI 物品 JSON 配置"""
+	
+	# AI 生成的火焰之剑
+	var flame_sword = {
+		"item_id": "flame_sword_001",
+		"display_name": "烈焰之剑",
+		"description": "被火焰之力加持的魔法剑",
+		"texture_path": "res://icon.svg",
+		"preset_type": "weapon",
+		"parameters": {
+			"damage": 120,
+			"fire_damage": 60,
+			"durability": 300,
+			"rarity": "epic",
+			"price": 3500,
+			"weight": 4.2,
+			"critical_chance": 0.15,
+			# 装备属性加成
+			"strength_bonus": 10,
+			"agility_bonus": 5,
+			"combat_skills_bonus": 8
+		},
+		"collision": {
+			"enabled": true,
+			"type": "circle",
+			"radius": 40.0,
+			"layer": 8,
+			"mask": 1
+		},
+		"components": {
+			"ParticleEffect": true
+		}
+	}
+	
+	# AI 生成的生命药水
+	var health_potion = {
+		"item_id": "health_potion_001",
+		"display_name": "高级生命药水",
+		"description": "恢复大量生命值的珍贵药水",
+		"texture_path": "res://icon.svg",
+		"preset_type": "consumable",
+		"parameters": {
+			"healing_amount": 200,
+			"energy_amount": 50,
+			"hunger_restore": 30,
+			"thirst_restore": 40,
+			"buff_duration": 10.0,
+			"buff_type": "力量提升",
+			"strength_buff": 5,
+			"agility_buff": 3,
+			"is_permanent_buff": false,
+			"remove_stress": true,
+			"rarity": "rare",
+			"price": 150,
+			"stack_size": 50
+		},
+		"collision": {
+			"enabled": true,
+			"type": "circle",
+			"radius": 25.0,
+			"layer": 8,
+			"mask": 1
+		},
+		"components": {
+			"ParticleEffect": true
+		}
+	}
+	
+	# AI 生成的冰霜法杖
+	var ice_staff = {
+		"item_id": "ice_staff_001",
+		"display_name": "寒冰法杖",
+		"description": "释放冰霜魔法的强大法杖",
+		"texture_path": "res://icon.svg",
+		"preset_type": "weapon",
+		"parameters": {
+			"damage": 80,
+			"ice_damage": 100,
+			"durability": 250,
+			"rarity": "legendary",
+			"price": 5000,
+			"weight": 2.5
+		},
+		"collision": {
+			"enabled": true,
+			"type": "auto",
+			"layer": 8,
+			"mask": 1
+		},
+		"components": {
+			"ParticleEffect": true
+		}
+	}
+	
+	# 保存 JSON 文件
+	_save_item_json("user://ai_items/flame_sword.json", flame_sword)
+	_save_item_json("user://ai_items/health_potion.json", health_potion)
+	_save_item_json("user://ai_items/ice_staff.json", ice_staff)
+	
+	# 添加一个使用网络图片的物品示例
+	var network_item = {
+		"item_id": "network_gem_001",
+		"display_name": "网络宝石",
+		"description": "从网络加载的神秘宝石",
+		"texture_path": "https://picsum.photos/128/128", # 示例：随机图片 API (JPEG 格式)
+		"preset_type": "consumable",
+		"parameters": {
+			"healing_amount": 0,
+			"energy_amount": 100,
+			"rarity": "epic",
+			"price": 999
+		},
+		"collision": {
+			"enabled": true,
+			"type": "circle",
+			"radius": 30.0,
+			"layer": 8,
+			"mask": 1
+		},
+		"components": {
+			"ParticleEffect": true
+		}
+	}
+	_save_item_json("user://ai_items/network_gem.json", network_item)
+	
+	print("已创建 4 个测试 AI 物品配置（包含 1 个网络图片示例）")
+
+func _save_item_json(path: String, data: Dictionary) -> void:
+	"""保存物品配置为 JSON 文件"""
+	var file = FileAccess.open(path, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(data, "\t"))
+		file.close()
+		print("已保存 JSON 文件: %s" % path)
+	else:
+		push_error("无法保存 JSON: %s" % path)
+
+func test_item_usage() -> void:
+	"""测试物品使用和属性修改"""
+	print("\n========== 测试物品使用系统 ==========\n")
+	
+	# 获取玩家 - 按场景树结构查找
+	var player = null
+	
+	# 尝试路径 1: Node2D/player/Player
+	var node2d = get_node_or_null("Node2D")
+	if node2d:
+		var player_container = node2d.get_node_or_null("player")
+		if player_container:
+			player = player_container.get_node_or_null("Player")
+	
+	# 尝试路径 2: player/Player
+	if not player:
+		var player_container = get_node_or_null("player")
+		if player_container:
+			player = player_container.get_node_or_null("Player")
+	
+	# 尝试路径 3: 直接查找 CharacterBody2D
+	if not player:
+		player = get_node_or_null("CharacterBody2D")
+	
+	if not player:
+		print("未找到玩家节点，跳过测试")
+		return
+	
+	print("玩家初始属性:")
+	print("  生命值: %d/%d" % [player.current_health, player.max_health])
+	print("  能量: %d/%d" % [player.energy, player.max_energy])
+	print("  力量: %d" % player.strength)
+	print("  敏捷: %d" % player.agility)
+	print("  战斗技能: %d" % player.combat_skills)
+	
+	# 1. 测试消耗品
+	print("\n--- 测试使用药水 ---")
+	var potion = get_node_or_null("health_potion_001")
+	if potion and potion.has_method("use"):
+		# 先降低生命值来测试
+		player.current_health = 50
+		print("降低生命值到: %d" % player.current_health)
+		
+		# 使用药水
+		potion.use(player)
+		print("使用后生命值: %d/%d" % [player.current_health, player.max_health])
+	
+	# 2. 测试武器装备
+	print("\n--- 测试装备武器 ---")
+	var weapon = get_node_or_null("flame_sword_001")
+	if weapon and weapon.has_method("equip"):
+		weapon.equip(player)
+		print("装备后属性:")
+		print("  力量: %d" % player.strength)
+		print("  敏捷: %d" % player.agility)
+		print("  战斗技能: %d" % player.combat_skills)
+		
+		# 测试攻击
+		print("\n--- 测试武器攻击 ---")
+		weapon.use()
+		weapon.use()
+		weapon.use()
+		
+		# 卸下武器
+		print("\n--- 卸下武器 ---")
+		weapon.unequip()
+		print("卸下后属性:")
+		print("  力量: %d" % player.strength)
+		print("  敏捷: %d" % player.agility)
+		print("  战斗技能: %d" % player.combat_skills)
+	
+	print("\n========================================\n")
 	
 
 func start_python_server() -> void:
@@ -52,114 +289,6 @@ func stop_python_server() -> void:
 func _exit_tree() -> void:
 	stop_python_server()
 
-func create_example_items() -> void:
-	"""创建示例物品数据"""
-	print("\n=== 创建示例物品 ===")
-	
-	# 1. 生命药水 - 在地图不同位置放3瓶
-	print("\n--- 创建生命药水模板 ---")
-	Iitem.create_consumable_template(
-		"生命药水",
-		"恢复50点生命值",
-		10,
-		1.0,
-		ItemBase.Rarity.COMMON,
-		50,
-		true,
-		99,
-		"potion_health"
-	)
-	Iitem.spawn_instance("potion_health", Vector2(200, 100), 1)
-	Iitem.spawn_instance("potion_health", Vector2(250, 150), 3)
-	Iitem.spawn_instance("potion_health", Vector2(300, 200), 5)
-	
-	# 2. 金币 - 在地图上散落多堆
-	print("\n--- 创建金币模板 ---")
-	Iitem.create_base_template(
-		"金币",
-		"闪闪发光的金币",
-		1,
-		0.01,
-		ItemBase.Rarity.COMMON,
-		true,
-		999,
-		"gold_coin"
-	)
-	Iitem.spawn_instance("gold_coin", Vector2(150, 100), 50)
-	Iitem.spawn_instance("gold_coin", Vector2(400, 150), 30)
-	Iitem.spawn_instance("gold_coin", Vector2(500, 200), 100)
-	Iitem.spawn_instance("gold_coin", Vector2(350, 250), 75)
-	
-	# 3. 铁剑 - 两把铁剑在不同位置
-	print("\n--- 创建铁剑模板 ---")
-	Iitem.create_equipment_template(
-		"铁剑",
-		"一把普通的铁剑,适合初学者使用",
-		100,
-		2.5,
-		EquipmentItem.EquipSlot.MAIN_HAND,
-		ItemBase.Rarity.UNCOMMON,
-		0,
-		15,
-		100,
-		2,
-		0,
-		0,
-		"sword_iron"
-	)
-	Iitem.spawn_instance("sword_iron", Vector2(450, 100))
-	Iitem.spawn_instance("sword_iron", Vector2(550, 150))
-	
-	# 4. 皮革护甲
-	print("\n--- 创建皮革护甲模板 ---")
-	Iitem.create_equipment_template(
-		"皮革护甲",
-		"轻便的皮革护甲,提供基础防护",
-		80,
-		3.0,
-		EquipmentItem.EquipSlot.CHEST,
-		ItemBase.Rarity.COMMON,
-		10,
-		0,
-		100,
-		0,
-		1,
-		0,
-		"armor_leather"
-	)
-	Iitem.spawn_instance("armor_leather", Vector2(300, 300))
-	
-	# 5. 传说宝石 - 稀有物品
-	print("\n--- 创建传说宝石模板 ---")
-	Iitem.create_base_template(
-		"传说宝石",
-		"散发着神秘光芒的珍贵宝石",
-		1000,
-		0.1,
-		ItemBase.Rarity.LEGENDARY,
-		false,
-		1,
-		"gem_legendary"
-	)
-	Iitem.spawn_instance("gem_legendary", Vector2(600, 300))
-	
-	# 6. 能量药水
-	print("\n--- 创建能量药水模板 ---")
-	Iitem.create_consumable_template(
-		"能量药水",
-		"恢复100点能量值",
-		25,
-		1.2,
-		ItemBase.Rarity.UNCOMMON,
-		0,
-		true,
-		50,
-		"potion_energy"
-	)
-	Iitem.spawn_instance("potion_energy", Vector2(250, 250), 2)
-	
-	Iitem.save_all_items()
-	Iitem.print_all_items()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:

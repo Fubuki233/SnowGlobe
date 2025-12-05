@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 GodotRPC="*res://scripts/static/godot_rpc.gd"
-Iitem="*res://scripts/items/Iitem.gd"
 
 [dotnet]
 

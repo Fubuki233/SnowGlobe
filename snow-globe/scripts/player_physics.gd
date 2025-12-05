@@ -111,14 +111,6 @@ func _ready() -> void:
 	player_moved.connect(_on_player_moved)
 	z_index = 10
 	
-	# 初始化背包
-	inventory = Inventory.new()
-	inventory.max_slots = 20
-	inventory.max_weight = 100.0
-	inventory.item_added.connect(_on_item_added)
-	inventory.item_removed.connect(_on_item_removed)
-	inventory.inventory_full.connect(_on_inventory_full)
-	add_child(inventory)
 	
 func get_status():
 	"""返回玩家状态"""
@@ -512,27 +504,3 @@ func _on_body_entered(_body):
 
 func _on_player_moved(new_position: Vector2):
 	print("Player moved to: ", new_position)
-
-# ============ 物品系统方法 ============
-
-func add_item_to_inventory(item: ItemBase, count: int = 1) -> bool:
-	"""供 ItemWorld 调用的拾取方法"""
-	if inventory:
-		return inventory.add_item(item, count)
-	return false
-
-func pickup_item(item: ItemBase, count: int = 1) -> bool:
-	"""拾取物品"""
-	return add_item_to_inventory(item, count)
-
-func _on_item_added(item: ItemBase, count: int):
-	"""物品添加到背包时的回调"""
-	print("[%s] 获得了: %s x%d" % [npc_name, item.item_name, count])
-
-func _on_item_removed(item: ItemBase, count: int):
-	"""物品从背包移除时的回调"""
-	print("[%s] 失去了: %s x%d" % [npc_name, item.item_name, count])
-
-func _on_inventory_full():
-	"""背包满了的回调"""
-	print("[%s] 背包已满!" % npc_name)

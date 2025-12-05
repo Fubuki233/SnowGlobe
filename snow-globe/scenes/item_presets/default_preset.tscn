@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://default_preset_scene"]
+
+[ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="1_icon"]
+
+[node name="DefaultPreset" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_icon")
+
+[node name="ParticleEffect" type="GPUParticles2D" parent="."]
+visible = false
+emitting = false
+
+[node name="SoundEffect" type="AudioStreamPlayer2D" parent="."]
+
+[node name="GlowEffect" type="PointLight2D" parent="."]
+visible = false
+enabled = false

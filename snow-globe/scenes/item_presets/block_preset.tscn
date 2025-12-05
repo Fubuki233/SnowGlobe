@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://block_preset_scene"]
+
+[ext_resource type="Texture2D" uid="uid://4q335xxs2p" path="res://icon.svg" id="1_icon"]
+
+[node name="BlockPreset" type="StaticBody2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_icon")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-64, -64, 64, -64, 64, 64, -64, 64)

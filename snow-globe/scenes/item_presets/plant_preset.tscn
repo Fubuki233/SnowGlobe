@@ -1,0 +1,48 @@
+[gd_scene load_steps=3 format=3 uid="uid://plant_preset_001"]
+
+[ext_resource type="Script" path="res://scripts/items/ai_plant.gd" id="1_plant"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_plant"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"stage_1",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"stage_2",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"stage_3",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"stage_4",
+"speed": 5.0
+}]
+
+[node name="PlantPreset" type="Node2D"]
+script = ExtResource("1_plant")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_plant")
+animation = &"default"
+
+[node name="InteractionArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea"]
+
+[node name="ParticleEffect" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 8
+lifetime = 0.5
+explosiveness = 0.8
