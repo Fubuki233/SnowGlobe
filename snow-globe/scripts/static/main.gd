@@ -56,7 +56,7 @@ func backpack_system_test() -> void:
 
 	# 检查物品
 	if player.has_item_in_inventory("铁剑", 1):
-		print("✓ 拥有铁剑!")
+		print(" 拥有铁剑!")
 
 	# 移除物品
 	player.remove_from_inventory("铁剑", 1)
@@ -90,18 +90,18 @@ func test_ai_item_system() -> void:
 	if weapon:
 		weapon.position = Vector2(400, 200)
 		add_child(weapon)
-		print("✓ 已加载 AI 武器到场景")
+		print(" 已加载 AI 武器到场景")
 	
 	# 4. 加载 AI 生成的药水
 	var potion = AIItemLoader.load_ai_item("user://ai_items/health_potion.json")
 	if potion:
 		potion.position = Vector2(550, 200)
 		add_child(potion)
-		print("✓ 已加载 AI 药水到场景")
+		print(" 已加载 AI 药水到场景")
 	
 	# 5. 批量加载所有 AI 物品
 	var all_items = AIItemLoader.load_all_from_directory(ai_items_dir)
-	print("✓ 从目录加载了 %d 个 AI 物品" % all_items.size())
+	print(" 从目录加载了 %d 个 AI 物品" % all_items.size())
 	
 	# 排列显示（除了前面已加载的）
 	for i in range(2, all_items.size()):
@@ -260,7 +260,7 @@ func test_ai_plant() -> void:
 	var dir = DirAccess.open(plants_dir)
 	
 	if not dir:
-		print("⚠ 植物目录不存在: %s" % plants_dir)
+		print(" 植物目录不存在: %s" % plants_dir)
 		return
 	
 	# 获取所有子目录（每个子目录代表一个植物）
@@ -274,11 +274,11 @@ func test_ai_plant() -> void:
 	dir.list_dir_end()
 	
 	if plant_folders.is_empty():
-		print("⚠ 未找到任何植物配置")
+		print(" 未找到任何植物配置")
 		print("  请先使用 SnowWeave 的植物生成功能生成植物动画")
 		return
 	
-	print("✓ 找到 %d 个植物: %s" % [plant_folders.size(), plant_folders])
+	print(" 找到 %d 个植物: %s" % [plant_folders.size(), plant_folders])
 	
 	# 获取玩家位置
 	var player_node = get_node_or_null("Node2D/player/Player")
@@ -289,7 +289,7 @@ func test_ai_plant() -> void:
 	# 获取 Node2D 用于添加植物
 	var game_world = get_node_or_null("Node2D")
 	if not game_world:
-		print("⚠ Node2D 未找到，将添加到 main")
+		print(" Node2D 未找到，将添加到 main")
 		game_world = self
 	
 	# 加载每个植物
@@ -302,7 +302,7 @@ func test_ai_plant() -> void:
 			config_path = plants_dir + plant_name + "/" + plant_name + ".json"
 		
 		if not FileAccess.file_exists(config_path):
-			print("⚠ 植物配置文件不存在: %s" % plant_name)
+			print(" 植物配置文件不存在: %s" % plant_name)
 			continue
 		
 		# 加载 AI 植物
@@ -311,14 +311,14 @@ func test_ai_plant() -> void:
 			# 将植物排列在玩家右边
 			plant.position = player_pos + Vector2(100 + i * spacing, 0)
 			game_world.add_child(plant)
-			print("✓ 已加载 AI 植物: %s, 位置: %s" % [plant_name, plant.position])
+			print(" 已加载 AI 植物: %s, 位置: %s" % [plant_name, plant.position])
 			
 			# 如果植物支持生长，设置自动生长测试
 			if plant.has_method("grow"):
 				var delay = 2.0 + i * 1.0 # 每个植物间隔1秒开始生长
 				_setup_auto_grow(plant, plant_name, delay)
 		else:
-			print("✗ 加载植物失败: %s" % plant_name)
+			print(" 加载植物失败: %s" % plant_name)
 
 func _setup_auto_grow(plant: Node, plant_name: String, initial_delay: float) -> void:
 	"""设置植物自动生长"""

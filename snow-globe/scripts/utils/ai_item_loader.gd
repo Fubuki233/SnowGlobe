@@ -69,7 +69,7 @@ static func load_ai_item(json_path: String) -> Node2D:
 	var components = config.get("components", {})
 	_configure_components(instance, components)
 	
-	print("✓ AI 物品加载成功: %s" % config.get("display_name", ""))
+	print(" AI 物品加载成功: %s" % config.get("display_name", ""))
 	return instance
 
 ## 批量加载 AI 物品
@@ -337,7 +337,7 @@ static func _on_texture_downloaded(
 	
 	var texture = ImageTexture.create_from_image(image)
 	_apply_texture_to_sprite(instance, texture, url, animation_config)
-	print("✓ 网络图片加载成功: %dx%d" % [image.get_width(), image.get_height()])
+	print(" 网络图片加载成功: %dx%d" % [image.get_width(), image.get_height()])
 
 ## 辅助方法: 加载贴图
 static func _load_texture(texture_path: String, animation_config: Dictionary = {}) -> Texture2D:

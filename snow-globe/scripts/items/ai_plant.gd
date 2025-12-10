@@ -88,11 +88,11 @@ func _load_fruit_template():
 	if ResourceLoader.exists(fruit_scene_path):
 		linked_fruit_template = load(fruit_scene_path)
 		if linked_fruit_template:
-			print("  ✓ 植物已绑定果实: %s" % fruit_scene_path)
+			print("   植物已绑定果实: %s" % fruit_scene_path)
 		else:
-			push_warning("  ✗ 无法加载果实场景: %s" % fruit_scene_path)
+			push_warning("   无法加载果实场景: %s" % fruit_scene_path)
 	else:
-		push_warning("  ✗ 果实场景不存在: %s" % fruit_scene_path)
+		push_warning("   果实场景不存在: %s" % fruit_scene_path)
 
 # ==================== 背包检测方法 ====================
 
@@ -289,11 +289,11 @@ func harvest(harvester: Node = null) -> Array:
 					# 添加到采集者背包
 					if harvester.inventory.add_item(fruit_instance, 1):
 						products.append(fruit_instance.display_name)
-						print("  ✓ 采集到果实: %s" % fruit_instance.display_name)
+						print("   采集到果实: %s" % fruit_instance.display_name)
 					else:
 						# 背包满了，释放实例
 						fruit_instance.queue_free()
-						print("  ✗ 背包已满，无法收集果实")
+						print("   背包已满，无法收集果实")
 		elif not fruit_item_id.is_empty():
 			# 旧方式：仅返回ID
 			products.append(fruit_item_id)

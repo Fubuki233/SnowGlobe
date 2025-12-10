@@ -46,7 +46,7 @@ func add_item(item: Node, quantity: int = 1) -> bool:
 	返回: 是否成功添加
 	"""
 	if not item:
-		print("[背包系统] ✗ 添加失败: 物品为空")
+		print("[背包系统]  添加失败: 物品为空")
 		return false
 	
 	# 获取物品重量
@@ -54,11 +54,11 @@ func add_item(item: Node, quantity: int = 1) -> bool:
 	if "weight" in item:
 		item_weight = item.weight
 	else:
-		print("[背包系统] ⚠ 物品没有 weight 属性,默认为 0.0")
+		print("[背包系统]  物品没有 weight 属性,默认为 0.0")
 	
 	# 检查承重
 	if not can_add_item(item_weight, quantity):
-		print("[背包系统] ✗ 超重! 当前: %.1f kg, 需要: %.1f kg, 上限: %.1f kg" %
+		print("[背包系统]  超重! 当前: %.1f kg, 需要: %.1f kg, 上限: %.1f kg" %
 			[current_weight, item_weight * quantity, max_weight])
 		return false
 	
@@ -83,7 +83,7 @@ func add_item(item: Node, quantity: int = 1) -> bool:
 	# 更新总重量
 	current_weight += item_weight * quantity
 	
-	print("[背包系统] ✓ 添加成功: %s x%d | 重量: %.1f kg | 总重: %.1f / %.1f kg" %
+	print("[背包系统]  添加成功: %s x%d | 重量: %.1f kg | 总重: %.1f / %.1f kg" %
 		[_get_item_display_name(item), quantity, item_weight * quantity, current_weight, max_weight])
 	
 	# 触发信号并打印背包内容
@@ -100,13 +100,13 @@ func remove_item(item_id: String, quantity: int = 1) -> bool:
 	返回: 是否成功移除
 	"""
 	if not items.has(item_id):
-		print("[背包系统] ✗ 移除失败: 未找到物品 ID '%s'" % item_id)
+		print("[背包系统]  移除失败: 未找到物品 ID '%s'" % item_id)
 		return false
 	
 	var item_data = items[item_id]
 	
 	if item_data["quantity"] < quantity:
-		print("[背包系统] ✗ 移除失败: 数量不足 (拥有: %d, 需要: %d)" % [item_data["quantity"], quantity])
+		print("[背包系统]  移除失败: 数量不足 (拥有: %d, 需要: %d)" % [item_data["quantity"], quantity])
 		return false
 	
 	# 减少数量
@@ -117,11 +117,11 @@ func remove_item(item_id: String, quantity: int = 1) -> bool:
 	# 如果数量为 0,移除物品
 	if item_data["quantity"] <= 0:
 		items.erase(item_id)
-		print("[背包系统] ✓ 移除成功: %s (全部) | 减少重量: %.1f kg" %
+		print("[背包系统]  移除成功: %s (全部) | 减少重量: %.1f kg" %
 			[item_id, weight_removed])
 	else:
 		item_data["weight"] = item_data["quantity"] * item_data["unit_weight"]
-		print("[背包系统] ✓ 移除成功: %s x%d | 剩余: %d | 减少重量: %.1f kg" %
+		print("[背包系统]  移除成功: %s x%d | 剩余: %d | 减少重量: %.1f kg" %
 			[item_id, quantity, item_data["quantity"], weight_removed])
 	
 	# 触发信号并打印背包内容

@@ -34,11 +34,11 @@ func _load_plant_template():
 	if ResourceLoader.exists(plant_scene_path):
 		linked_plant_template = load(plant_scene_path)
 		if linked_plant_template:
-			print("  ✓ 已加载植物模板: %s" % plant_scene_path)
+			print("   已加载植物模板: %s" % plant_scene_path)
 		else:
-			push_warning("  ✗ 无法加载植物场景: %s" % plant_scene_path)
+			push_warning("   无法加载植物场景: %s" % plant_scene_path)
 	else:
-		push_warning("  ✗ 植物场景不存在: %s" % plant_scene_path)
+		push_warning("   植物场景不存在: %s" % plant_scene_path)
 
 # ==================== 种植功能 ====================
 
@@ -49,7 +49,7 @@ func can_plant(character: Node) -> bool:
 	
 	# 检查是否在背包中
 	if not is_in_inventory(character):
-		print("[种植] ✗ 果实不在背包中")
+		print("[种植]  果实不在背包中")
 		return false
 	
 	# 检查是否有植物模板
@@ -57,13 +57,13 @@ func can_plant(character: Node) -> bool:
 		_load_plant_template()
 	
 	if not linked_plant_template:
-		print("[种植] ✗ 未配置植物场景")
+		print("[种植]  未配置植物场景")
 		return false
 	
 	# 检查农业技能
 	if "survival_skills" in character:
 		if character.survival_skills < required_farming_skill:
-			print("[种植] ✗ 农业技能不足 (需要: %d, 当前: %d)" %
+			print("[种植]  农业技能不足 (需要: %d, 当前: %d)" %
 				[required_farming_skill, character.survival_skills])
 			return false
 	
@@ -87,13 +87,13 @@ func plant(character: Node, position: Vector2 = Vector2.ZERO) -> Node:
 	# 从背包移除果实
 	if "inventory" in character and character.inventory:
 		if not character.inventory.remove_item(display_name, 1):
-			print("[种植] ✗ 从背包移除果实失败")
+			print("[种植]  从背包移除果实失败")
 			return null
 	
 	# 实例化植物
 	var plant_instance = linked_plant_template.instantiate()
 	if not plant_instance:
-		print("[种植] ✗ 实例化植物失败")
+		print("[种植]  实例化植物失败")
 		# 失败时退还果实
 		if "inventory" in character and character.inventory:
 			character.inventory.add_item(self, 1)
@@ -118,13 +118,13 @@ func plant(character: Node, position: Vector2 = Vector2.ZERO) -> Node:
 		character.get_tree().root.add_child(plant_instance)
 	
 	var character_name = character.npc_name if "npc_name" in character else character.name
-	print("[种植] ✓ %s 在 (%.0f, %.0f) 种植了 %s" %
+	print("[种植]  %s 在 (%.0f, %.0f) 种植了 %s" %
 		[character_name, plant_position.x, plant_position.y, display_name])
 	
 	# 触发种植技能提升
 	if "survival_skills" in character:
 		character.survival_skills += 1
-		print("  ✓ 农业技能提升: %d" % character.survival_skills)
+		print("   农业技能提升: %d" % character.survival_skills)
 	
 	return plant_instance
 

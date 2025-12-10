@@ -57,8 +57,8 @@ TilemapImporter.save_tileset_to_file(tile_set, "res://Assets/tilesets/my_tileset
 
 ## 优势
 
-✓ **持久化**: TileSet 保存为 .tres 文件，可以在编辑器中永久使用  
-✓ **可复用**: 同一个 TileSet 可以在多个场景中使用  
-✓ **可编辑**: 在 Godot 编辑器中可以直接查看和编辑  
-✓ **版本控制**: .tres 文件可以被 Git 等版本控制系统管理  
-✓ **资源引用**: 其他资源可以引用该 TileSet 文件
+ **持久化**: TileSet 保存为 .tres 文件，可以在编辑器中永久使用  
+ **可复用**: 同一个 TileSet 可以在多个场景中使用  
+ **可编辑**: 在 Godot 编辑器中可以直接查看和编辑  
+ **版本控制**: .tres 文件可以被 Git 等版本控制系统管理  
+ **资源引用**: 其他资源可以引用该 TileSet 文件

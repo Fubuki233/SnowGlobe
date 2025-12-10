@@ -87,9 +87,9 @@ class GodotRPCServer:
         error = data.get("error")
         
         if success:
-            print(f"[结果] ✓ {result}")
+            print(f"[结果]  {result}")
         else:
-            print(f"[错误] ✗ {error}")
+            print(f"[错误]  {error}")
         
         # 转发给对应的客户端
         if call_id in self.pending_calls:

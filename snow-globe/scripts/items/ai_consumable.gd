@@ -124,19 +124,19 @@ func use(user: Node = null) -> void:
 	if healing_amount > 0 and "current_health" in user:
 		var old_health = user.current_health
 		user.current_health = min(user.current_health + healing_amount, user.max_health)
-		print("  ✓ 生命值: %d → %d (+%d)" % [old_health, user.current_health, user.current_health - old_health])
+		print("   生命值: %d → %d (+%d)" % [old_health, user.current_health, user.current_health - old_health])
 	
 	# 2. 恢复能量
 	if energy_amount > 0 and "energy" in user:
 		var old_energy = user.energy
 		user.energy = min(user.energy + energy_amount, user.max_energy)
-		print("  ✓ 能量: %d → %d (+%d)" % [old_energy, user.energy, user.energy - old_energy])
+		print("   能量: %d → %d (+%d)" % [old_energy, user.energy, user.energy - old_energy])
 	
 	# 3. 恢复饥饿度
 	if hunger_restore > 0 and "hunger" in user:
 		var old_hunger = user.hunger
 		user.hunger = min(user.hunger + hunger_restore, user.max_hunger)
-		print("  ✓ 饥饿度: %d → %d (+%d)" % [old_hunger, user.hunger, user.hunger - old_hunger])
+		print("   饥饿度: %d → %d (+%d)" % [old_hunger, user.hunger, user.hunger - old_hunger])
 		if "is_hungry" in user:
 			user.is_hungry = false
 	
@@ -144,41 +144,41 @@ func use(user: Node = null) -> void:
 	if thirst_restore > 0 and "thirst" in user:
 		var old_thirst = user.thirst
 		user.thirst = min(user.thirst + thirst_restore, user.max_thirst)
-		print("  ✓ 口渴度: %d → %d (+%d)" % [old_thirst, user.thirst, user.thirst - old_thirst])
+		print("   口渴度: %d → %d (+%d)" % [old_thirst, user.thirst, user.thirst - old_thirst])
 		if "is_thirsty" in user:
 			user.is_thirsty = false
 	
 	# 5. 治疗状态异常
 	if cure_poison and "is_sick" in user:
 		user.is_sick = false
-		print("  ✓ 治疗中毒")
+		print("   治疗中毒")
 	
 	if cure_sickness and "is_sick" in user:
 		user.is_sick = false
-		print("  ✓ 治疗疾病")
+		print("   治疗疾病")
 	
 	if remove_stress and "is_stressed" in user:
 		user.is_stressed = false
-		print("  ✓ 消除压力")
+		print("   消除压力")
 	
 	if cure_injury and "is_injured" in user:
 		user.is_injured = false
-		print("  ✓ 治疗伤势")
+		print("   治疗伤势")
 	
 	if cure_tiredness and "is_tired" in user:
 		user.is_tired = false
-		print("  ✓ 消除疲劳")
+		print("   消除疲劳")
 	
 	# 6. 设置特殊状态
 	if set_resting and "is_resting" in user:
 		user.is_resting = true
-		print("  ✓ 进入休息状态")
+		print("   进入休息状态")
 	
 	if set_energized and "is_tired" in user:
 		user.is_tired = false
 		if "energy" in user:
 			user.energy = user.max_energy
-		print("  ✓ 充满活力")
+		print("   充满活力")
 	
 	# 7. 应用属性增益
 	if is_permanent_buff:
@@ -186,11 +186,11 @@ func use(user: Node = null) -> void:
 	elif buff_duration > 0:
 		_apply_temporary_buffs(user)
 	
-	print("✓ 消耗品使用完成")
+	print(" 消耗品使用完成")
 
 func _apply_permanent_buffs(user: Node) -> void:
 	"""应用永久属性加成"""
-	print("  ✓ 应用永久属性增益")
+	print("   应用永久属性增益")
 	
 	# 移动属性
 	if speed_buff > 0 and "speed" in user:
@@ -269,7 +269,7 @@ func _apply_permanent_buffs(user: Node) -> void:
 
 func _apply_temporary_buffs(user: Node) -> void:
 	"""应用临时属性加成"""
-	print("  ✓ 获得增益效果: %s (持续 %.1f 秒)" % [buff_type if buff_type else "属性提升", buff_duration])
+	print("   获得增益效果: %s (持续 %.1f 秒)" % [buff_type if buff_type else "属性提升", buff_duration])
 	
 	# 移动属性
 	if speed_buff > 0 and "speed" in user:
