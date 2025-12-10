@@ -66,6 +66,49 @@ var buff_timer: Timer = null
 func _ready() -> void:
 	print("消耗品已创建: 治疗=%d, 能量=%d" % [healing_amount, energy_amount])
 
+# ==================== 背包检测方法 ====================
+
+func is_in_inventory(character: Node = null) -> bool:
+	"""检测物品是否在角色背包中"""
+	if character:
+		# 检测指定角色的背包
+		if "inventory" in character and character.inventory:
+			return character.inventory.has_item(display_name, 1)
+		return false
+	else:
+		# 检测所有角色的背包
+		return get_owner_character() != null
+
+func get_owner_character() -> Node:
+	"""获取拥有此物品的角色（遍历场景树查找）"""
+	var root = get_tree().root if get_tree() else null
+	if not root:
+		return null
+	
+	var characters = _find_all_characters(root)
+	for character in characters:
+		if "inventory" in character and character.inventory:
+			if character.inventory.has_item(display_name, 1):
+				return character
+	return null
+
+func get_quantity_in_inventory(character: Node) -> int:
+	"""获取物品在指定角色背包中的数量"""
+	if not character or not "inventory" in character or not character.inventory:
+		return 0
+	return character.inventory.get_item_quantity(display_name)
+
+func _find_all_characters(node: Node) -> Array:
+	"""递归查找所有角色节点（拥有 inventory 属性的节点）"""
+	var characters = []
+	if "inventory" in node:
+		characters.append(node)
+	
+	for child in node.get_children():
+		characters.append_array(_find_all_characters(child))
+	
+	return characters
+
 func use(user: Node = null) -> void:
 	"""使用消耗品"""
 	if not user:

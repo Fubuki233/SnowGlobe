@@ -1,0 +1,65 @@
+{
+    "item_id": "oak",
+    "display_name": "Oak",
+    "description": "oak",
+    "preset_type": "plant",
+    "growth_stages": 4,
+    "animations_per_stage": 2,
+    "total_animations": 8,
+    "texture_directory": "res://Assets/Items/plants/oak/final_frames",
+    "animations": {
+        "stage1_transition": {
+            "frames": 24,
+            "loop": false,
+            "description": "Stage 1 transition animation (play once on stage change)"
+        },
+        "stage1_idle": {
+            "frames": 24,
+            "loop": true,
+            "description": "Stage 1 idle animation (loop continuously)"
+        },
+        "stage2_transition": {
+            "frames": 24,
+            "loop": false,
+            "description": "Stage 2 transition animation (play once on stage change)"
+        },
+        "stage2_idle": {
+            "frames": 24,
+            "loop": true,
+            "description": "Stage 2 idle animation (loop continuously)"
+        },
+        "stage3_transition": {
+            "frames": 24,
+            "loop": false,
+            "description": "Stage 3 transition animation (play once on stage change)"
+        },
+        "stage3_idle": {
+            "frames": 24,
+            "loop": true,
+            "description": "Stage 3 idle animation (loop continuously)"
+        },
+        "stage4_transition": {
+            "frames": 24,
+            "loop": false,
+            "description": "Stage 4 transition animation (play once on stage change)"
+        },
+        "stage4_idle": {
+            "frames": 24,
+            "loop": true,
+            "description": "Stage 4 idle animation (loop continuously)"
+        }
+    },
+    "naming_format": {
+        "transition": "{plant_id}-stage{X}-transition-frame{Y}.png",
+        "idle": "{plant_id}-stage{X}-idle-frame{Y}.png"
+    },
+    "parameters": {
+        "plant_type": "草",
+        "lifespan": 10.0,
+        "has_fruit": false
+    },
+    "collision": {
+        "enabled": true,
+        "type": "circle"
+    }
+}

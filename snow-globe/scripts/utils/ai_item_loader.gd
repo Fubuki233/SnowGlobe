@@ -436,14 +436,15 @@ static func _find_node_by_type(root: Node, node_type) -> Node:
 static func _setup_plant_animations(instance: Node2D, config: Dictionary) -> void:
 	"""
 	为植物设置生长阶段动画
-	根据 growth_stages 和 animations 数组自动分配
+	支持三种方式:
+	1. texture_directory: 从目录加载 {植物id}-stage{X}-frame{Y}.png 格式的贴图
+	2. animations: 直接指定每个阶段的贴图/动画路径数组
+	3. 两者都没有时跳过
 	"""
+	var item_id = config.get("item_id", instance.name)
 	var growth_stages = config.get("growth_stages", 4)
 	var animations = config.get("animations", [])
-	
-	if animations.is_empty():
-		print("  未提供植物动画序列")
-		return
+	var texture_directory = config.get("texture_directory", "")
 	
 	var animated_sprite = instance.get_node_or_null("AnimatedSprite2D")
 	if not animated_sprite:
@@ -458,37 +459,236 @@ static func _setup_plant_animations(instance: Node2D, config: Dictionary) -> voi
 		sprite_frames = SpriteFrames.new()
 		animated_sprite.sprite_frames = sprite_frames
 	
-	# 根据动画数量和生长阶段数分配动画
-	for stage in range(growth_stages):
-		var anim_name = "stage_%d" % (stage + 1)
-		
-		# 如果动画已存在，跳过
-		if sprite_frames.has_animation(anim_name):
+	# 方式1: 从目录加载 {植物id}-stage{X}-frame{Y}.png 格式的贴图
+	if not texture_directory.is_empty():
+		print("  扫描贴图目录: %s" % texture_directory)
+		var stage_frames = _scan_plant_texture_directory(texture_directory, item_id)
+		print("  找到动画类型数量: %d" % stage_frames.size())
+		for key in stage_frames.keys():
+			print("    %s: %d 帧" % [key, stage_frames[key].size()])
+		if not stage_frames.is_empty():
+			_create_plant_animations_from_frames(sprite_frames, item_id, stage_frames, growth_stages)
+			print("  已从目录加载 %d 个生长阶段动画" % stage_frames.size())
+			# 打印所有已创建的动画
+			var all_anims = sprite_frames.get_animation_names()
+			print("  SpriteFrames 中的所有动画: %s" % str(all_anims))
+			return
+	
+	# 方式2: 使用 animations 数组
+	if not animations.is_empty():
+		_create_plant_animations_from_array(sprite_frames, item_id, animations, growth_stages)
+		print("  已从配置数组设置 %d 个生长阶段动画" % growth_stages)
+		return
+	
+	print("  未提供植物动画配置 (texture_directory 或 animations)")
+
+## 辅助方法: 扫描植物贴图目录
+static func _scan_plant_texture_directory(texture_dir: String, item_id: String) -> Dictionary:
+	"""
+	扫描目录，查找新格式 {植物id}-stage{X}-{transition|idle}-frame{Y}.png
+	或旧格式 {植物id}-stage{X}-frame{Y}.png 的文件
+	
+	返回: { 
+		"stage1_transition": [frame_paths...],
+		"stage1_idle": [frame_paths...],
+		"stage1": [frame_paths...],  # 旧格式回退
+		...
+	}
+	"""
+	var stage_frames: Dictionary = {}
+	
+	var dir = DirAccess.open(texture_dir)
+	if not dir:
+		push_warning("  无法打开贴图目录: %s" % texture_dir)
+		return stage_frames
+	
+	var pattern = "%s-stage" % item_id
+	
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	while file_name != "":
+		# 跳过目录和 .import 文件
+		if dir.current_is_dir() or file_name.ends_with(".import"):
+			file_name = dir.get_next()
 			continue
 		
+		# 检查是否匹配格式
+		if file_name.begins_with(pattern):
+			var base_name = file_name.get_basename()
+			var parts = base_name.split("-")
+			
+			# 新格式: [item_id, stageX, transition/idle, frameY]
+			# 旧格式: [item_id, stageX, frameY]
+			if parts.size() >= 3:
+				var stage_part = parts[1] # stageX
+				if stage_part.begins_with("stage"):
+					var stage_num = stage_part.substr(5).to_int()
+					if stage_num > 0:
+						var key: String
+						
+						# 检查是否是新格式 (transition/idle)
+						if parts.size() >= 4 and (parts[2] == "transition" or parts[2] == "idle"):
+							# 新格式: stage{X}_{transition|idle}
+							key = "stage%d_%s" % [stage_num, parts[2]]
+						else:
+							# 旧格式: stage{X}
+							key = "stage%d" % stage_num
+						
+						if not stage_frames.has(key):
+							stage_frames[key] = []
+						stage_frames[key].append(texture_dir.path_join(file_name))
+		
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	
+	# 对每个动画类型的帧进行自然数排序（frame1, frame2, ..., frame10, frame11）
+	for key in stage_frames.keys():
+		stage_frames[key].sort_custom(_natural_sort_frames)
+	
+	return stage_frames
+
+## 辅助方法: 自然数排序帧文件
+static func _natural_sort_frames(a: String, b: String) -> bool:
+	"""按帧号自然排序 (frame1 < frame2 < frame10)"""
+	var num_a = _extract_frame_number(a)
+	var num_b = _extract_frame_number(b)
+	return num_a < num_b
+
+static func _extract_frame_number(path: String) -> int:
+	"""从文件路径提取帧号，如 oak-stage1-idle-frame12.png -> 12"""
+	var file_name = path.get_file().get_basename() # oak-stage1-idle-frame12
+	var parts = file_name.split("frame")
+	if parts.size() >= 2:
+		return parts[-1].to_int() # "12" -> 12
+	return 0
+
+## 辅助方法: 从帧字典创建植物动画
+static func _create_plant_animations_from_frames(sprite_frames: SpriteFrames, item_id: String, stage_frames: Dictionary, growth_stages: int) -> void:
+	"""
+	从帧字典创建 SpriteFrames 动画
+	新格式动画命名: {item_id}_stage{X}_transition (过渡动画, 不循环)
+	                {item_id}_stage{X}_idle (循环动画)
+	旧格式回退: {item_id}_stage{X}
+	"""
+	# 检测是否使用新格式 (有 transition/idle 键)
+	var has_new_format = false
+	for key in stage_frames.keys():
+		if "_transition" in key or "_idle" in key:
+			has_new_format = true
+			break
+	
+	for stage_num in range(1, growth_stages + 1):
+		if has_new_format:
+			# 新格式: 创建 transition 和 idle 两个动画
+			var transition_key = "stage%d_transition" % stage_num
+			var idle_key = "stage%d_idle" % stage_num
+			
+			# 创建过渡动画 (不循环，阶段切换时播放一次)
+			var transition_anim = "%s_stage%d_transition" % [item_id, stage_num]
+			_create_single_animation(sprite_frames, transition_anim,
+				_get_frames_with_fallback(stage_frames, transition_key, stage_num, "_transition"),
+				8.0, false) # 8 FPS, 不循环
+			
+			# 创建循环动画 (乒乓循环: 正放->倒放，由 ai_plant.gd 控制)
+			var idle_anim = "%s_stage%d_idle" % [item_id, stage_num]
+			_create_single_animation(sprite_frames, idle_anim,
+				_get_frames_with_fallback(stage_frames, idle_key, stage_num, "_idle"),
+				5.0, false) # 5 FPS, 不循环（由脚本控制乒乓）
+		else:
+			# 旧格式: 创建单个循环动画
+			var anim_name = "%s_stage%d" % [item_id, stage_num]
+			var key = "stage%d" % stage_num
+			_create_single_animation(sprite_frames, anim_name,
+				_get_frames_with_fallback(stage_frames, key, stage_num, ""),
+				5.0, true) # 5 FPS, 循环
+
+## 辅助方法: 创建单个动画
+static func _create_single_animation(sprite_frames: SpriteFrames, anim_name: String, frame_paths: Array, fps: float, loop: bool) -> void:
+	"""创建单个 SpriteFrames 动画，FPS 根据帧数自动计算"""
+	# 移除已存在的同名动画
+	if sprite_frames.has_animation(anim_name):
+		sprite_frames.remove_animation(anim_name)
+	
+	sprite_frames.add_animation(anim_name)
+	
+	# 根据帧数动态计算 FPS，保持固定的动画时长
+	# 过渡动画 (transition): 目标时长约 2.0 秒
+	# 循环动画 (idle): 目标时长约 3.0 秒（单向，乒乓循环总时长 6 秒）
+	var frame_count = frame_paths.size()
+	var actual_fps = fps
+	if frame_count > 0:
+		var is_idle = "_idle" in anim_name
+		var target_duration = 3.0 if is_idle else 2.0 # idle 3秒单向，transition 2秒
+		actual_fps = float(frame_count) / target_duration
+		# 限制 FPS 范围在 2-30 之间
+		actual_fps = clamp(actual_fps, 2.0, 30.0)
+	
+	sprite_frames.set_animation_speed(anim_name, actual_fps)
+	sprite_frames.set_animation_loop(anim_name, loop)
+	
+	# 添加帧
+	for frame_path in frame_paths:
+		var texture = _load_texture(frame_path)
+		if texture:
+			sprite_frames.add_frame(anim_name, texture)
+	
+	if frame_count > 0:
+		var is_idle = "_idle" in anim_name
+		var loop_str = "乒乓循环" if is_idle else ("循环" if loop else "单次")
+		var duration = frame_count / actual_fps
+		print("    动画 '%s': %d 帧, %.1f FPS, %.2f秒 (%s)" % [anim_name, frame_count, actual_fps, duration, loop_str])
+
+## 辅助方法: 获取帧路径（带回退）
+static func _get_frames_with_fallback(stage_frames: Dictionary, key: String, stage_num: int, suffix: String) -> Array:
+	"""获取指定键的帧路径，如果没有则回退到最近的阶段"""
+	if stage_frames.has(key):
+		return stage_frames[key]
+	
+	# 回退：查找最近的已有阶段
+	for fallback_stage in range(stage_num - 1, 0, -1):
+		var fallback_key = "stage%d%s" % [fallback_stage, suffix]
+		if stage_frames.has(fallback_key):
+			return stage_frames[fallback_key]
+	
+	return []
+
+## 辅助方法: 从数组创建植物动画
+static func _create_plant_animations_from_array(sprite_frames: SpriteFrames, item_id: String, animations: Array, growth_stages: int) -> void:
+	"""
+	从配置数组创建 SpriteFrames 动画
+	animations 可以是:
+	- 字符串数组: ["path1.png", "path2.png", ...]
+	- 嵌套数组: [["stage1_frame1.png", "stage1_frame2.png"], ["stage2_frame1.png"], ...]
+	"""
+	for stage in range(growth_stages):
+		var anim_name = "%s_stage%d" % [item_id, stage + 1]
+		
+		# 移除已存在的同名动画
+		if sprite_frames.has_animation(anim_name):
+			sprite_frames.remove_animation(anim_name)
+		
 		sprite_frames.add_animation(anim_name)
+		sprite_frames.set_animation_speed(anim_name, 5.0)
+		sprite_frames.set_animation_loop(anim_name, true)
 		
 		# 计算应该使用哪个动画资源
 		var anim_index = stage
 		if stage >= animations.size():
-			# 如果动画不足，使用最后一个动画
 			anim_index = animations.size() - 1
 		
 		var anim_path = animations[anim_index]
 		
 		# 加载动画帧
 		if anim_path is String:
-			var texture = load(anim_path) as Texture2D
+			var texture = _load_texture(anim_path)
 			if texture:
 				sprite_frames.add_frame(anim_name, texture)
 		elif anim_path is Array:
 			# 如果是帧序列
 			for frame_path in anim_path:
-				var texture = load(frame_path) as Texture2D
+				var texture = _load_texture(frame_path)
 				if texture:
 					sprite_frames.add_frame(anim_name, texture)
-	
-	print("  已设置 %d 个生长阶段动画" % growth_stages)
 
 ## 辅助方法: 生成碰撞体积
 static func _generate_collision(instance: Node2D, texture_path: String, collision_config: Dictionary) -> void:

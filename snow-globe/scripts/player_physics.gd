@@ -1,6 +1,7 @@
 extends CharacterBody2D
 signal hit
 signal player_moved(new_position: Vector2)
+var InventorySystem = preload("res://scripts/inventory_system.gd")
 @export var id = "player_1"
 
 #=========================== 枚举定义 ===========================
@@ -103,13 +104,17 @@ var target_path: PackedVector2Array = []
 var current_path_index = 0
 
 # 背包系统
-var inventory = null
+var inventory: InventorySystem = null
 
 func _ready() -> void:
 	GodotRPC.register_instance(id, self)
 	# 连接 Python 触发的信号
 	player_moved.connect(_on_player_moved)
 	z_index = 10
+	
+	# 初始化背包系统
+	inventory = InventorySystem.new(strength)
+	print("[%s] 背包系统已初始化 | 承重上限: %.1f kg" % [npc_name, inventory.max_weight])
 	
 	
 func get_status():
@@ -293,7 +298,8 @@ func get_complete_data() -> Dictionary:
 		"attributes": get_all_attributes(),
 		"status": get_all_status(),
 		"position": {"x": position.x, "y": position.y},
-		"velocity": {"x": velocity.x, "y": velocity.y}
+		"velocity": {"x": velocity.x, "y": velocity.y},
+		"inventory": inventory.get_inventory_data() if inventory else {}
 	}
 
 
@@ -329,6 +335,10 @@ func reset():
 	luck = 1
 	perception = 1
 	wisdom = 1
+	
+	# 更新背包承重
+	if inventory:
+		inventory.update_max_weight(strength)
 	
 	# 重置技能属性
 	mental_strength = 1
@@ -504,3 +514,82 @@ func _on_body_entered(_body):
 
 func _on_player_moved(new_position: Vector2):
 	print("Player moved to: ", new_position)
+
+# ==================== 背包管理方法 ====================
+
+func update_inventory_capacity():
+	"""更新背包承重上限 (当力量值变化时调用)"""
+	if inventory:
+		inventory.update_max_weight(strength)
+
+func add_to_inventory(item: Node, quantity: int = 1) -> bool:
+	"""添加物品到背包"""
+	if not inventory:
+		print("[%s] 背包系统未初始化" % npc_name)
+		return false
+	return inventory.add_item(item, quantity)
+
+func remove_from_inventory(item_id: String, quantity: int = 1) -> bool:
+	"""从背包移除物品"""
+	if not inventory:
+		print("[%s] 背包系统未初始化" % npc_name)
+		return false
+	return inventory.remove_item(item_id, quantity)
+
+func has_item_in_inventory(item_id: String, quantity: int = 1) -> bool:
+	"""检查背包中是否有指定物品"""
+	if not inventory:
+		return false
+	return inventory.has_item(item_id, quantity)
+
+func get_inventory_info() -> Dictionary:
+	"""获取背包信息"""
+	if inventory:
+		return inventory.get_inventory_data()
+	return {}
+
+func print_inventory():
+	"""打印背包内容"""
+	if inventory:
+		inventory._print_inventory()
+
+func clear_inventory():
+	"""清空背包"""
+	if inventory:
+		inventory.clear_inventory()
+
+func plant_fruit(fruit_name: String, plant_position: Vector2 = Vector2.ZERO) -> Node:
+	"""
+	种植果实
+	fruit_name: 果实名称（display_name）
+	plant_position: 种植位置（默认为角色当前位置）
+	返回: 生成的植物节点，失败返回 null
+	"""
+	if not inventory:
+		print("[%s] 背包系统未初始化" % npc_name)
+		return null
+	
+	# 从背包中查找果实
+	var inventory_data = inventory.get_inventory_data()
+	if not inventory_data.has("items"):
+		print("[%s] 背包为空" % npc_name)
+		return null
+	
+	var items = inventory_data["items"]
+	if not items.has(fruit_name):
+		print("[%s] 背包中没有 %s" % [npc_name, fruit_name])
+		return null
+	
+	var fruit_data = items[fruit_name]
+	var fruit = fruit_data["item"]
+	
+	# 检查是否是 AIFruit 类型
+	if not fruit is AIFruit:
+		print("[%s] %s 不是可种植的果实" % [npc_name, fruit_name])
+		return null
+	
+	# 调用果实的种植方法
+	var pos = plant_position if plant_position != Vector2.ZERO else global_position
+	var plant = fruit.plant(self, pos)
+	
+	return plant

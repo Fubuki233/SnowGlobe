@@ -35,6 +35,11 @@ AI 生成的植物基础脚本
 @export var fruit_mature_stage: int = -1 # 果实成熟阶段（-1 表示无果实）
 @export_enum("自动掉落", "采集后获得") var fruit_drop_mechanism: String = "采集后获得"
 @export var fruit_item_id: String = "" # 果实物品 ID
+@export var fruit_scene_path: String = "" # 果实场景路径（AIFruit）
+@export var fruit_yield: int = 1 # 每次采集获得的果实数量
+
+# 关联的果实模板
+var linked_fruit_template: PackedScene = null
 
 # ==================== 采集与交互 ====================
 @export_group("采集交互")
@@ -54,6 +59,7 @@ AI 生成的植物基础脚本
 @export_enum("普通", "稀有", "史诗") var rarity: String = "普通"
 @export_enum("药材", "食材", "建材", "观赏") var usage: String = "观赏"
 @export var regeneration: bool = false # 再生能力
+@export var weight: float = 0.5 # 重量（kg）
 
 # ==================== 内部状态 ====================
 var age: float = 0.0 # 当前年龄
@@ -72,6 +78,64 @@ func _ready() -> void:
 	
 	# 设置初始阶段
 	_update_visual_stage()
+	
+	# 加载关联的果实模板
+	if fruit_scene_path != "":
+		_load_fruit_template()
+
+func _load_fruit_template():
+	"""加载关联的果实场景模板"""
+	if ResourceLoader.exists(fruit_scene_path):
+		linked_fruit_template = load(fruit_scene_path)
+		if linked_fruit_template:
+			print("  ✓ 植物已绑定果实: %s" % fruit_scene_path)
+		else:
+			push_warning("  ✗ 无法加载果实场景: %s" % fruit_scene_path)
+	else:
+		push_warning("  ✗ 果实场景不存在: %s" % fruit_scene_path)
+
+# ==================== 背包检测方法 ====================
+
+func is_in_inventory(character: Node = null) -> bool:
+	"""检测物品是否在角色背包中"""
+	if character:
+		# 检测指定角色的背包
+		if "inventory" in character and character.inventory:
+			return character.inventory.has_item(display_name, 1)
+		return false
+	else:
+		# 检测所有角色的背包
+		return get_owner_character() != null
+
+func get_owner_character() -> Node:
+	"""获取拥有此物品的角色（遍历场景树查找）"""
+	var root = get_tree().root if get_tree() else null
+	if not root:
+		return null
+	
+	var characters = _find_all_characters(root)
+	for character in characters:
+		if "inventory" in character and character.inventory:
+			if character.inventory.has_item(display_name, 1):
+				return character
+	return null
+
+func get_quantity_in_inventory(character: Node) -> int:
+	"""获取物品在指定角色背包中的数量"""
+	if not character or not "inventory" in character or not character.inventory:
+		return 0
+	return character.inventory.get_item_quantity(display_name)
+
+func _find_all_characters(node: Node) -> Array:
+	"""递归查找所有角色节点（拥有 inventory 属性的节点）"""
+	var characters = []
+	if "inventory" in node:
+		characters.append(node)
+	
+	for child in node.get_children():
+		characters.append_array(_find_all_characters(child))
+	
+	return characters
 
 func _process(delta: float) -> void:
 	if is_dead:
@@ -114,21 +178,82 @@ func _grow_to_next_stage() -> void:
 	if has_fruit and current_stage == fruit_mature_stage:
 		print("%s 的果实已成熟！" % name)
 
+# 当前是否处于过渡动画状态
+var _is_in_transition: bool = false
+# idle 动画是否正在倒放
+var _is_idle_reversed: bool = false
+# 当前 idle 动画名称
+var _current_idle_anim: String = ""
+
 func _update_visual_stage() -> void:
-	"""更新植物外观到当前阶段"""
-	if not animated_sprite or not animated_sprite.sprite_frames:
+	"""更新植物外观到当前阶段（播放过渡动画）"""
+	if animated_sprite and animated_sprite.sprite_frames:
+		# 确保信号只连接一次
+		if not animated_sprite.animation_finished.is_connected(_on_animation_finished):
+			animated_sprite.animation_finished.connect(_on_animation_finished)
+		
+		# {植物id}_stage{X}_transition (过渡动画) / {植物id}_stage{X}_idle (循环动画)
+		var transition_anim = "%s_stage%d_transition" % [name, current_stage + 1]
+		var idle_anim = "%s_stage%d_idle" % [name, current_stage + 1]
+		
+		# 更新当前阶段的 idle 动画名称
+		_current_idle_anim = idle_anim
+		
+		# 优先尝试新的 transition/idle 格式
+		if animated_sprite.sprite_frames.has_animation(transition_anim):
+			_is_in_transition = true
+			_is_idle_reversed = false
+			animated_sprite.animation = transition_anim
+			animated_sprite.play()
+			print("%s 播放过渡动画: %s" % [name, transition_anim])
+			return
+		elif animated_sprite.sprite_frames.has_animation(idle_anim):
+			# 如果没有 transition 动画，直接播放 idle
+			_start_idle_animation(idle_anim)
+			return
+		else:
+			# 没有找到任何匹配的动画
+			push_warning("%s: 未找到阶段 %d 的动画 (%s 或 %s)" % [name, current_stage + 1, transition_anim, idle_anim])
+
+func _start_idle_animation(idle_anim: String) -> void:
+	"""开始播放 idle 动画（乒乓循环的起点）"""
+	_is_in_transition = false
+	_is_idle_reversed = false
+	_current_idle_anim = idle_anim
+	animated_sprite.animation = idle_anim
+	animated_sprite.frame = 0 # 确保从第一帧开始
+	animated_sprite.play()
+	print("%s 播放循环动画: %s" % [name, idle_anim])
+
+func _on_animation_finished() -> void:
+	"""动画播放完成回调"""
+	if not animated_sprite:
 		return
 	
-	# 尝试播放对应阶段的动画
-	var anim_name = "stage_%d" % (current_stage + 1)
-	if animated_sprite.sprite_frames.has_animation(anim_name):
-		animated_sprite.animation = anim_name
-		animated_sprite.play()
-	else:
-		# 如果没有对应动画，尝试使用默认动画
-		if animated_sprite.sprite_frames.has_animation("default"):
-			animated_sprite.animation = "default"
-			animated_sprite.frame = min(current_stage, animated_sprite.sprite_frames.get_frame_count("default") - 1)
+	var current_anim = animated_sprite.animation
+	
+	# 如果是过渡动画完成，切换到 idle
+	if _is_in_transition:
+		_is_in_transition = false
+		if animated_sprite.sprite_frames.has_animation(_current_idle_anim):
+			_start_idle_animation(_current_idle_anim)
+		return
+	
+	# 如果是 idle 动画完成，进行乒乓循环
+	if "_idle" in current_anim:
+		_is_idle_reversed = not _is_idle_reversed
+		var frame_count = animated_sprite.sprite_frames.get_frame_count(current_anim)
+		if _is_idle_reversed:
+			# 倒放：从最后一帧开始
+			animated_sprite.frame = frame_count - 1
+			animated_sprite.play_backwards()
+		else:
+			# 正放：从第一帧开始
+			animated_sprite.frame = 0
+			animated_sprite.play()
+
+# 用于存储各阶段贴图（Sprite2D 回退方案，由 AIItemLoader 填充）
+var stage_textures: Array[Texture2D] = []
 
 func harvest(harvester: Node = null) -> Array:
 	"""采集植物"""
@@ -154,9 +279,23 @@ func harvest(harvester: Node = null) -> Array:
 	
 	var products = []
 	
-	# 收集果实（如果有）
+	# 收集果实（如果有）- 生成果实实例并添加到背包
 	if has_fruit and current_stage >= fruit_mature_stage and fruit_drop_mechanism == "采集后获得":
-		if not fruit_item_id.is_empty():
+		if linked_fruit_template and harvester and "inventory" in harvester:
+			# 实例化果实
+			for i in range(fruit_yield):
+				var fruit_instance = linked_fruit_template.instantiate()
+				if fruit_instance:
+					# 添加到采集者背包
+					if harvester.inventory.add_item(fruit_instance, 1):
+						products.append(fruit_instance.display_name)
+						print("  ✓ 采集到果实: %s" % fruit_instance.display_name)
+					else:
+						# 背包满了，释放实例
+						fruit_instance.queue_free()
+						print("  ✗ 背包已满，无法收集果实")
+		elif not fruit_item_id.is_empty():
+			# 旧方式：仅返回ID
 			products.append(fruit_item_id)
 			print("采集到果实: %s" % fruit_item_id)
 	
@@ -166,7 +305,8 @@ func harvest(harvester: Node = null) -> Array:
 	harvested_count += 1
 	cooldown_timer = harvest_cooldown
 	
-	print("%s 采集完成，获得: %s" % [name, products])
+	var harvester_name = harvester.npc_name if harvester and "npc_name" in harvester else "未知"
+	print("[采集] %s 采集了 %s，获得: %s" % [harvester_name, display_name, products])
 	
 	# 如果是一次性采集，采集后死亡
 	if harvest_times == 1:

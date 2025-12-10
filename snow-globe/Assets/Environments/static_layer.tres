@@ -1,45 +1,15 @@
-[gd_resource type="TileSet" load_steps=9 format=3 uid="uid://c8sxam3gjwjn"]
+[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://c8sxam3gjwjn"]
 
-[ext_resource type="Texture2D" uid="uid://dinc5gxnd0cau" path="res://tileset_advanced.png" id="1_57ths"]
-[ext_resource type="Texture2D" uid="uid://em5f1876q8hd" path="res://Assets/Environments/Tilesheet/tilesheet_complete.png" id="2_ctc7w"]
+[ext_resource type="Texture2D" uid="uid://xu6o36kubvav" path="res://Assets/Environments/2D_Isometric_Tile_Pack/Sprites/Grass/grass_02/grass_02_iso_tile_256_02.png" id="1_ctc7w"]
 [ext_resource type="PackedScene" path="res://scenes/generated_tiles/clay.tscn" id="3_h2a28"]
 [ext_resource type="PackedScene" uid="uid://dqlsg2jv3onvx" path="res://scenes/trap_block.tscn" id="4_h2a28"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_57ths"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_l6pdb"]
-texture = ExtResource("1_57ths")
-texture_region_size = Vector2i(128, 128)
-0:0/0 = 0
-0:0/0/custom_data_0 = "Grass"
-1:0/0 = 0
-1:0/0/custom_data_0 = "Sea"
-2:0/0 = 0
-2:0/0/custom_data_0 = "Stone"
-
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_h2a28"]
-texture = ExtResource("2_ctc7w")
-texture_region_size = Vector2i(111, 128)
+texture = ExtResource("1_ctc7w")
+texture_region_size = Vector2i(256, 256)
 0:0/0 = 0
-0:0/0/texture_origin = Vector2i(0, -30)
-1:0/0 = 0
-1:0/0/texture_origin = Vector2i(0, -30)
-1:1/0 = 0
-1:1/0/texture_origin = Vector2i(0, -30)
-5:3/0 = 0
-5:3/0/texture_origin = Vector2i(0, -30)
-5:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -32, -55.5, 0, -56.19834, 63.636356, 0, 96.694214, 55.371902, 63.636356, 55.5, 0)
-4:3/0 = 0
-4:3/0/texture_origin = Vector2i(0, -30)
-4:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(0, -32, -55.5, 0, -56.19834, 63.636356, 0, 96.694214, 55.371902, 63.636356, 55.5, 0)
-0:6/0 = 0
-0:6/0/texture_origin = Vector2i(0, -30)
-1:6/0 = 0
-1:6/0/texture_origin = Vector2i(0, -30)
-7:2/0 = 0
-7:2/0/texture_origin = Vector2i(0, -30)
-14:2/0 = 0
-14:2/0/texture_origin = Vector2i(0, -30)
 
 [sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_5dni3"]
 resource_name = "Blocks"
@@ -49,11 +19,10 @@ scenes/2/scene = ExtResource("4_h2a28")
 [resource]
 tile_shape = 1
 tile_layout = 5
-tile_size = Vector2i(111, 64)
+tile_size = Vector2i(256, 128)
 physics_layer_0/collision_layer = 1
 physics_layer_0/physics_material = SubResource("PhysicsMaterial_57ths")
 custom_data_layer_0/name = "Name"
 custom_data_layer_0/type = 4
-sources/0 = SubResource("TileSetAtlasSource_l6pdb")
-sources/1 = SubResource("TileSetAtlasSource_h2a28")
 sources/3 = SubResource("TileSetScenesCollectionSource_5dni3")
+sources/2 = SubResource("TileSetAtlasSource_h2a28")

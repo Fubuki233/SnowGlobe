@@ -31,6 +31,7 @@ animations = [{
 }]
 
 [node name="PlantPreset" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_plant")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
