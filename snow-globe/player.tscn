@@ -1,6 +1,6 @@
 [gd_scene load_steps=29 format=3 uid="uid://ckudr8chj1kgo"]
 
-[ext_resource type="Script" uid="uid://bb5p683rm8m3a" path="res://scripts/player_physics.gd" id="1_onrkg"]
+[ext_resource type="Script" uid="uid://c2nn4nlxfvhx3" path="res://scripts/PlayerPhysics.cs" id="1_onrkg"]
 [ext_resource type="Texture2D" uid="uid://vwxjx001r3xv" path="res://Assets/Roles/Actors/DefaultGirl/walk_sheet.png" id="2_onrkg"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_i3pqv"]

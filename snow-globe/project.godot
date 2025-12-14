@@ -11,13 +11,12 @@ config_version=5
 [application]
 
 config/name="Snow_Globe"
-run/main_scene="uid://4pqund3nukl7"
-config/features=PackedStringArray("4.5", "GL Compatibility")
+config/features=PackedStringArray("4.5", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-GodotRPC="*res://scripts/static/godot_rpc.gd"
+GodotRPC="*res://scripts/static/GodotRPC.cs"
 
 [dotnet]
 

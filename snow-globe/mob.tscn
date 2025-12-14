@@ -1,6 +1,6 @@
-[gd_scene load_steps=9 format=3 uid="uid://c1twr2i6iwxt8"]
+[gd_scene load_steps=9 format=3 uid="uid://c43or4b5ax67r"]
 
-[ext_resource type="Script" uid="uid://b1nvycu07via4" path="res://scripts/mob.gd" id="1_b3mxk"]
+[ext_resource type="Script" path="res://scripts/mob.gd" id="1_b3mxk"]
 [ext_resource type="Texture2D" uid="uid://i5y61r8sroqu" path="res://Assets/Roles/Actors/DefaultGirl/frame_000.png" id="2_1qmh0"]
 [ext_resource type="Texture2D" uid="uid://n5tgeivxv00y" path="res://Assets/Roles/Actors/DefaultGirl/frame_001.png" id="3_gfurk"]
 [ext_resource type="Texture2D" uid="uid://dgut883aemgrk" path="res://Assets/Roles/Actors/DefaultGirl/frame_002.png" id="4_ieysi"]
