@@ -1,3 +1,11 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Output directories
+/out/
+/outputs/
+/api_outputs/
+/map_outputs/
+/gradio_outputs/
+/snow-globe/out/
